@@ -33,6 +33,7 @@ namespace RiskFlow
                 options.UseSqlite(AppPaths.ConnectionString));
 
             services.AddSingleton<RisksViewModel>();
+            services.AddSingleton<ShellViewModel>();
             services.AddTransient<MainPage>();
             services.AddTransient<MainWindow>();
 
@@ -47,6 +48,9 @@ namespace RiskFlow
             {
                 await DbInitializer.InitializeAsync(db);
             }
+
+            // Charge les analyses avant d'afficher la fenêtre (le shell sélectionne la 1re).
+            await Services.GetRequiredService<ShellViewModel>().LoadAsync();
 
             _window = Services.GetRequiredService<MainWindow>();
             _window.Activate();

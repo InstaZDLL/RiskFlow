@@ -11,7 +11,7 @@ using RiskFlow.Data;
 namespace RiskFlow.Data.Migrations
 {
     [DbContext(typeof(RiskFlowDbContext))]
-    [Migration("20260530223942_InitialCreate")]
+    [Migration("20260530230250_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -20,27 +20,56 @@ namespace RiskFlow.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.8");
 
+            modelBuilder.Entity("RiskFlow.Core.Risks.Analysis", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ModelKey")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SortOrder");
+
+                    b.ToTable("Analyses");
+                });
+
             modelBuilder.Entity("RiskFlow.Core.Risks.Risk", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("AfterLikelihood")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("AfterLikelihoodIndex")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("AfterSeverity")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("AfterSeverityIndex")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("BeforeLikelihood")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("AnalysisId")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("BeforeSeverity")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("BeforeLikelihoodIndex")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BeforeSeverityIndex")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("CanContinue")
                         .HasColumnType("INTEGER");
@@ -73,6 +102,8 @@ namespace RiskFlow.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AnalysisId");
+
                     b.HasIndex("SortOrder");
 
                     b.ToTable("Risks");
@@ -103,6 +134,22 @@ namespace RiskFlow.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("RiskCategories");
+                });
+
+            modelBuilder.Entity("RiskFlow.Core.Risks.Risk", b =>
+                {
+                    b.HasOne("RiskFlow.Core.Risks.Analysis", "Analysis")
+                        .WithMany("Risks")
+                        .HasForeignKey("AnalysisId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Analysis");
+                });
+
+            modelBuilder.Entity("RiskFlow.Core.Risks.Analysis", b =>
+                {
+                    b.Navigation("Risks");
                 });
 #pragma warning restore 612, 618
         }

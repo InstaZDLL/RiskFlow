@@ -3,7 +3,7 @@ using RiskFlow.ViewModels;
 
 namespace RiskFlow
 {
-    /// <summary>Page principale : registre des risques.</summary>
+    /// <summary>Page du registre des risques de l'analyse courante.</summary>
     public sealed partial class MainPage : Page
     {
         public RisksViewModel ViewModel { get; }
@@ -12,7 +12,6 @@ namespace RiskFlow
         {
             ViewModel = viewModel;
             InitializeComponent();
-            ViewModel.LoadCommand.Execute(null);
         }
     }
 }

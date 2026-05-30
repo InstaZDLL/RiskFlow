@@ -12,6 +12,23 @@ namespace RiskFlow.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Analyses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    ModelKey = table.Column<string>(type: "TEXT", nullable: false),
+                    SortOrder = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Analyses", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RiskCategories",
                 columns: table => new
                 {
@@ -33,15 +50,16 @@ namespace RiskFlow.Data.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    AnalysisId = table.Column<int>(type: "INTEGER", nullable: false),
                     RiskNumber = table.Column<int>(type: "INTEGER", nullable: false),
                     Title = table.Column<string>(type: "TEXT", nullable: false),
                     Category = table.Column<string>(type: "TEXT", nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: true),
-                    BeforeSeverity = table.Column<string>(type: "TEXT", nullable: false),
-                    BeforeLikelihood = table.Column<string>(type: "TEXT", nullable: false),
+                    BeforeSeverityIndex = table.Column<int>(type: "INTEGER", nullable: false),
+                    BeforeLikelihoodIndex = table.Column<int>(type: "INTEGER", nullable: false),
                     MitigationStrategy = table.Column<string>(type: "TEXT", nullable: true),
-                    AfterSeverity = table.Column<string>(type: "TEXT", nullable: false),
-                    AfterLikelihood = table.Column<string>(type: "TEXT", nullable: false),
+                    AfterSeverityIndex = table.Column<int>(type: "INTEGER", nullable: false),
+                    AfterLikelihoodIndex = table.Column<int>(type: "INTEGER", nullable: false),
                     CanContinue = table.Column<bool>(type: "INTEGER", nullable: false),
                     SortOrder = table.Column<int>(type: "INTEGER", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
@@ -50,13 +68,29 @@ namespace RiskFlow.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Risks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Risks_Analyses_AnalysisId",
+                        column: x => x.AnalysisId,
+                        principalTable: "Analyses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Analyses_SortOrder",
+                table: "Analyses",
+                column: "SortOrder");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RiskCategories_Name",
                 table: "RiskCategories",
                 column: "Name",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Risks_AnalysisId",
+                table: "Risks",
+                column: "AnalysisId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Risks_SortOrder",
@@ -72,6 +106,9 @@ namespace RiskFlow.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Risks");
+
+            migrationBuilder.DropTable(
+                name: "Analyses");
         }
     }
 }

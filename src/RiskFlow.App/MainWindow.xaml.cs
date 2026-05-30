@@ -1,18 +1,30 @@
-using System;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using RiskFlow.ViewModels;
+using RiskFlow.Views;
 using WinRT.Interop;
 
 namespace RiskFlow
 {
-    /// <summary>Fenêtre principale : héberge la page du registre des risques.</summary>
+    /// <summary>Fenêtre principale : barre latérale des analyses + registre des risques.</summary>
     public sealed partial class MainWindow : Window
     {
-        public MainWindow(MainPage page)
+        public ShellViewModel ViewModel { get; }
+
+        public MainWindow(ShellViewModel viewModel, MainPage page)
         {
+            ViewModel = viewModel;
             InitializeComponent();
-            RootContainer.Children.Add(page);
+            ContentHost.Children.Add(page);
             SetWindowIcon();
+        }
+
+        private async void OnNewAnalysisClick(object sender, RoutedEventArgs e)
+        {
+            var dialog = new NewAnalysisDialog { XamlRoot = Content.XamlRoot };
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+                await ViewModel.CreateAnalysisAsync(dialog.AnalysisName, dialog.SelectedModelKey);
         }
 
         /// <summary>Applique l'icône RiskFlow à la fenêtre (barre de titre + barre des tâches).</summary>

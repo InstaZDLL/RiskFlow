@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="RiskFlow.Views.NewAnalysisDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:risks="using:RiskFlow.Core.Risks"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Nouvelle analyse"
+    PrimaryButtonText="Créer"
+    CloseButtonText="Annuler"
+    DefaultButton="Primary">
+
+    <StackPanel Spacing="20" MinWidth="380">
+        <TextBox x:Name="NameBox"
+                 Header="Nom de l'analyse"
+                 PlaceholderText="Ex. AD Account Manager" />
+
+        <RadioButtons x:Name="ModelChoice" Header="Modèle de matrice">
+            <RadioButtons.ItemTemplate>
+                <DataTemplate x:DataType="risks:RiskMatrixModel">
+                    <StackPanel Spacing="0">
+                        <TextBlock Text="{x:Bind Name}" />
+                        <TextBlock Text="{x:Bind Dimensions}"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+                </DataTemplate>
+            </RadioButtons.ItemTemplate>
+        </RadioButtons>
+    </StackPanel>
+</ContentDialog>

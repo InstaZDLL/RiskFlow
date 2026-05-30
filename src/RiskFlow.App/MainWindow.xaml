@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:RiskFlow"
+    xmlns:risks="using:RiskFlow.Core.Risks"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -13,5 +14,37 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid x:Name="RootContainer" />
+    <NavigationView x:Name="Nav"
+                    IsSettingsVisible="False"
+                    IsBackButtonVisible="Collapsed"
+                    PaneDisplayMode="Left"
+                    MenuItemsSource="{x:Bind ViewModel.Analyses}"
+                    SelectedItem="{x:Bind ViewModel.SelectedAnalysis, Mode=TwoWay}">
+
+        <NavigationView.PaneHeader>
+            <Button Click="OnNewAnalysisClick"
+                    Height="34"
+                    Margin="4,0,4,0"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource AccentButtonStyle}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon Glyph="&#xE710;" FontSize="13" />
+                    <TextBlock Text="Nouvelle analyse" />
+                </StackPanel>
+            </Button>
+        </NavigationView.PaneHeader>
+
+        <NavigationView.MenuItemTemplate>
+            <DataTemplate x:DataType="risks:Analysis">
+                <StackPanel Spacing="0">
+                    <TextBlock Text="{x:Bind Name}" />
+                    <TextBlock Text="{x:Bind Model.Dimensions}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </DataTemplate>
+        </NavigationView.MenuItemTemplate>
+
+        <Grid x:Name="ContentHost" />
+    </NavigationView>
 </Window>

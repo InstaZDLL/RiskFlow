@@ -1,38 +1,39 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RiskFlow.Core.Risks;
 
 namespace RiskFlow.Data;
 
 /// <summary>
-/// Contexte EF Core / SQLite de RiskFlow. Les gravités et probabilités sont stockées
-/// sous leur libellé français et les niveaux dérivés ne sont pas persistés (recalculés).
+/// Contexte EF Core / SQLite de RiskFlow. Une analyse possède plusieurs risques
+/// (suppression en cascade) ; les catégories sont partagées entre analyses.
 /// </summary>
 public class RiskFlowDbContext(DbContextOptions<RiskFlowDbContext> options) : DbContext(options)
 {
+    public DbSet<Analysis> Analyses => Set<Analysis>();
     public DbSet<Risk> Risks => Set<Risk>();
     public DbSet<RiskCategory> RiskCategories => Set<RiskCategory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var severityConverter = new ValueConverter<Severity, string>(
-            v => v.ToFr(),
-            v => RiskLabels.ParseSeverity(v));
-
-        var likelihoodConverter = new ValueConverter<Likelihood, string>(
-            v => v.ToFr(),
-            v => RiskLabels.ParseLikelihood(v));
+        modelBuilder.Entity<Analysis>(entity =>
+        {
+            entity.HasKey(a => a.Id);
+            entity.Property(a => a.Name).IsRequired();
+            entity.Property(a => a.ModelKey).IsRequired();
+            entity.HasIndex(a => a.SortOrder);
+        });
 
         modelBuilder.Entity<Risk>(entity =>
         {
             entity.HasKey(r => r.Id);
             entity.Property(r => r.Title).IsRequired();
             entity.Property(r => r.Category).IsRequired();
-            entity.Property(r => r.BeforeSeverity).HasConversion(severityConverter);
-            entity.Property(r => r.BeforeLikelihood).HasConversion(likelihoodConverter);
-            entity.Property(r => r.AfterSeverity).HasConversion(severityConverter);
-            entity.Property(r => r.AfterLikelihood).HasConversion(likelihoodConverter);
+            entity.HasIndex(r => r.AnalysisId);
             entity.HasIndex(r => r.SortOrder);
+            entity.HasOne(r => r.Analysis)
+                .WithMany(a => a.Risks)
+                .HasForeignKey(r => r.AnalysisId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<RiskCategory>(entity =>
@@ -61,7 +62,7 @@ public class RiskFlowDbContext(DbContextOptions<RiskFlowDbContext> options) : Db
         var now = DateTimeOffset.UtcNow;
         foreach (var entry in ChangeTracker.Entries())
         {
-            if (entry.Entity is not (Risk or RiskCategory))
+            if (entry.Entity is not (Analysis or Risk or RiskCategory))
                 continue;
 
             if (entry.State == EntityState.Added)
