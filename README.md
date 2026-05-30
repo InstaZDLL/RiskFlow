@@ -12,6 +12,7 @@
 [![EF Core + SQLite](https://img.shields.io/badge/EF%20Core-SQLite-003B57?logo=sqlite&logoColor=white)](https://learn.microsoft.com/ef/core/)
 [![C#](https://img.shields.io/badge/C%23-13-239120?logo=csharp&logoColor=white)](#)
 [![Statut](https://img.shields.io/badge/statut-en%20d%C3%A9veloppement-orange)](#)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue)](LICENSE)
 
 </div>
 
@@ -99,4 +100,18 @@ dotnet publish src/RiskFlow.App/RiskFlow.csproj -c Release -r win-x64 -p:Platfor
 
 ## Licence
 
-À définir.
+Copyright 2026 InstaZDLL
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Voir le fichier [LICENSE](LICENSE) pour le texte complet.
