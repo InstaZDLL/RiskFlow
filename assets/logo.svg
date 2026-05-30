@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#191924"/>
+      <stop offset="100%" stop-color="#0b0b10"/>
+    </linearGradient>
+
+    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2a52be"/>
+      <stop offset="100%" stop-color="#002244"/>
+    </linearGradient>
+
+    <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF512F"/>
+      <stop offset="100%" stop-color="#DD2476"/>
+    </linearGradient>
+
+    <filter id="fluentShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <rect x="16" y="16" width="224" height="224" rx="48" fill="url(#bgGradient)" filter="url(#fluentShadow)"/>
+
+  <rect x="17" y="17" width="222" height="222" rx="47" fill="none" stroke="#ffffff" stroke-opacity="0.1" stroke-width="2"/>
+
+  <path d="M128 56 C128 56 184 72 184 128 C184 176 128 208 128 208 C128 208 72 176 72 128 C72 72 128 56 128 56 Z"
+        fill="url(#shieldGradient)"
+        filter="url(#fluentShadow)"/>
+
+  <path d="M128 58 C130 58 182 74 182 128 C182 174 128 205 128 205 C128 205 74 174 74 128 C74 74 126 58 128 58 Z"
+        fill="none" stroke="#ffffff" stroke-opacity="0.2" stroke-width="1.5"/>
+
+  <path d="M60 160 L104 116 L136 144 L188 84"
+        fill="none"
+        stroke="url(#flowGradient)"
+        stroke-width="14"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        filter="url(#fluentShadow)"/>
+
+  <circle cx="188" cy="84" r="8" fill="#DD2476" filter="url(#fluentShadow)"/>
+  <circle cx="60" cy="160" r="6" fill="#FF512F" />
+</svg>

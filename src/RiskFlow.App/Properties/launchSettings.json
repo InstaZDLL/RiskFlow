@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "RiskFlow (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "RiskFlow (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

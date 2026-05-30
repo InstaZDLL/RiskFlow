@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="RiskFlow.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:RiskFlow"
+    xmlns:conv="using:RiskFlow.Converters"
+    xmlns:risks="using:RiskFlow.Core.Risks"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <Grid Padding="24" RowSpacing="16">
+        <Grid.Resources>
+            <conv:RiskLevelToBrushConverter x:Key="LevelBrush" />
+            <conv:RiskLevelToLabelConverter x:Key="LevelLabel" />
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- En-tête -->
+        <StackPanel Grid.Row="0" Spacing="2">
+            <TextBlock Text="Registre des risques" Style="{StaticResource TitleTextBlockStyle}" />
+            <TextBlock Text="Évaluez vos risques projet avant et après mitigation."
+                       Style="{StaticResource BodyTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </StackPanel>
+
+        <!-- Barre d'actions -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+            <Button Content="Ajouter un risque"
+                    Style="{StaticResource AccentButtonStyle}"
+                    Command="{x:Bind ViewModel.AddRiskCommand}" />
+            <Button Content="Supprimer"
+                    Command="{x:Bind ViewModel.DeleteRiskCommand}"
+                    CommandParameter="{x:Bind ViewModel.SelectedRisk, Mode=OneWay}" />
+        </StackPanel>
+
+        <!-- Liste des risques -->
+        <Border Grid.Row="2"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1" CornerRadius="8">
+            <ListView ItemsSource="{x:Bind ViewModel.Risks}"
+                      SelectedItem="{x:Bind ViewModel.SelectedRisk, Mode=TwoWay}"
+                      SelectionMode="Single">
+                <ListView.HeaderTemplate>
+                    <DataTemplate>
+                        <Grid Padding="12,8" ColumnSpacing="12"
+                              Background="{ThemeResource LayerFillColorDefaultBrush}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="48" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="140" />
+                                <ColumnDefinition Width="110" />
+                                <ColumnDefinition Width="110" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="N°" FontWeight="SemiBold" />
+                            <TextBlock Grid.Column="1" Text="Titre" FontWeight="SemiBold" />
+                            <TextBlock Grid.Column="2" Text="Catégorie" FontWeight="SemiBold" />
+                            <TextBlock Grid.Column="3" Text="Avant" FontWeight="SemiBold" />
+                            <TextBlock Grid.Column="4" Text="Après" FontWeight="SemiBold" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.HeaderTemplate>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="risks:Risk">
+                        <Grid Padding="0,8" ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="48" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="140" />
+                                <ColumnDefinition Width="110" />
+                                <ColumnDefinition Width="110" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                       Text="{x:Bind RiskNumber}" />
+                            <TextBlock Grid.Column="1" VerticalAlignment="Center"
+                                       Text="{x:Bind Title}" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Grid.Column="2" VerticalAlignment="Center"
+                                       Text="{x:Bind Category}" />
+
+                            <Border Grid.Column="3" HorizontalAlignment="Left"
+                                    CornerRadius="4" Padding="8,2"
+                                    Background="{x:Bind BeforeRiskLevel, Converter={StaticResource LevelBrush}}">
+                                <TextBlock Foreground="White" FontWeight="SemiBold"
+                                           Text="{x:Bind BeforeRiskLevel, Converter={StaticResource LevelLabel}}" />
+                            </Border>
+
+                            <Border Grid.Column="4" HorizontalAlignment="Left"
+                                    CornerRadius="4" Padding="8,2"
+                                    Background="{x:Bind AfterRiskLevel, Converter={StaticResource LevelBrush}}">
+                                <TextBlock Foreground="White" FontWeight="SemiBold"
+                                           Text="{x:Bind AfterRiskLevel, Converter={StaticResource LevelLabel}}" />
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Border>
+    </Grid>
+</Page>
