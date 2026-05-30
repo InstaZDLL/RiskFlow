@@ -11,100 +11,207 @@
     mc:Ignorable="d"
     Background="Transparent">
 
-    <Grid Padding="24" RowSpacing="16">
-        <Grid.Resources>
-            <conv:RiskLevelToBrushConverter x:Key="LevelBrush" />
-            <conv:RiskLevelToLabelConverter x:Key="LevelLabel" />
-        </Grid.Resources>
+    <Page.Resources>
+        <conv:RiskLevelToBrushConverter x:Key="LevelBrush" />
+        <conv:RiskLevelToLabelConverter x:Key="LevelLabel" />
+        <conv:BoolToVisibilityConverter x:Key="BoolToVis" />
+    </Page.Resources>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <Grid ColumnSpacing="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
 
-        <!-- En-tête : nom de l'analyse + modèle courant -->
-        <StackPanel Grid.Row="0" Spacing="2">
-            <TextBlock Text="{x:Bind ViewModel.AnalysisName, Mode=OneWay}"
-                       Style="{StaticResource TitleTextBlockStyle}" />
-            <TextBlock Style="{StaticResource BodyTextBlockStyle}"
-                       Foreground="{ThemeResource TextFillColorSecondaryBrush}">
-                <Run Text="Registre des risques · modèle" />
-                <Run Text="{x:Bind ViewModel.ModelName, Mode=OneWay}" />
-            </TextBlock>
-        </StackPanel>
+        <!-- ===== Colonne gauche : registre ===== -->
+        <Grid Grid.Column="0" Padding="24" RowSpacing="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-        <!-- Barre d'actions -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
-            <Button Content="Ajouter un risque"
-                    Style="{StaticResource AccentButtonStyle}"
-                    Command="{x:Bind ViewModel.AddRiskCommand}" />
-            <Button Content="Supprimer"
-                    Command="{x:Bind ViewModel.DeleteRiskCommand}"
-                    CommandParameter="{x:Bind ViewModel.SelectedRow, Mode=OneWay}" />
-        </StackPanel>
+            <StackPanel Grid.Row="0" Spacing="2">
+                <TextBlock Text="{x:Bind ViewModel.AnalysisName, Mode=OneWay}"
+                           Style="{StaticResource TitleTextBlockStyle}" />
+                <TextBlock Style="{StaticResource BodyTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                    <Run Text="Registre des risques · modèle" />
+                    <Run Text="{x:Bind ViewModel.ModelName, Mode=OneWay}" />
+                </TextBlock>
+            </StackPanel>
 
-        <!-- Liste des risques -->
-        <Border Grid.Row="2"
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+                <Button Content="Ajouter un risque"
+                        Style="{StaticResource AccentButtonStyle}"
+                        Command="{x:Bind ViewModel.AddRiskCommand}" />
+                <Button Content="Supprimer"
+                        Command="{x:Bind ViewModel.DeleteRiskCommand}"
+                        CommandParameter="{x:Bind ViewModel.SelectedRow, Mode=OneWay}" />
+            </StackPanel>
+
+            <Border Grid.Row="2"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="8">
+                <ListView ItemsSource="{x:Bind ViewModel.Rows}"
+                          SelectedItem="{x:Bind ViewModel.SelectedRow, Mode=TwoWay}"
+                          SelectionMode="Single">
+                    <ListView.HeaderTemplate>
+                        <DataTemplate>
+                            <Grid Padding="12,8" ColumnSpacing="12"
+                                  Background="{ThemeResource LayerFillColorDefaultBrush}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="48" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="140" />
+                                    <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="100" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="N°" FontWeight="SemiBold" />
+                                <TextBlock Grid.Column="1" Text="Titre" FontWeight="SemiBold" />
+                                <TextBlock Grid.Column="2" Text="Catégorie" FontWeight="SemiBold" />
+                                <TextBlock Grid.Column="3" Text="Avant" FontWeight="SemiBold" />
+                                <TextBlock Grid.Column="4" Text="Après" FontWeight="SemiBold" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.HeaderTemplate>
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:RiskRowViewModel">
+                            <Grid Padding="0,8" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="48" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="140" />
+                                    <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="100" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                           Text="{x:Bind RiskNumber}" />
+                                <TextBlock Grid.Column="1" VerticalAlignment="Center"
+                                           Text="{x:Bind Title, Mode=OneWay}" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Grid.Column="2" VerticalAlignment="Center"
+                                           Text="{x:Bind Category, Mode=OneWay}" />
+
+                                <Border Grid.Column="3" HorizontalAlignment="Left"
+                                        CornerRadius="4" Padding="8,2"
+                                        Background="{x:Bind BeforeLevel, Mode=OneWay, Converter={StaticResource LevelBrush}}">
+                                    <TextBlock Foreground="White" FontWeight="SemiBold"
+                                               Text="{x:Bind BeforeLevel, Mode=OneWay, Converter={StaticResource LevelLabel}}" />
+                                </Border>
+
+                                <Border Grid.Column="4" HorizontalAlignment="Left"
+                                        CornerRadius="4" Padding="8,2"
+                                        Background="{x:Bind AfterLevel, Mode=OneWay, Converter={StaticResource LevelBrush}}">
+                                    <TextBlock Foreground="White" FontWeight="SemiBold"
+                                               Text="{x:Bind AfterLevel, Mode=OneWay, Converter={StaticResource LevelLabel}}" />
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Border>
+        </Grid>
+
+        <!-- ===== Colonne droite : panneau de détail ===== -->
+        <Border Grid.Column="1" Width="380"
+                Visibility="{x:Bind ViewModel.HasSelection, Mode=OneWay, Converter={StaticResource BoolToVis}}"
                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                BorderThickness="1" CornerRadius="8">
-            <ListView ItemsSource="{x:Bind ViewModel.Rows}"
-                      SelectedItem="{x:Bind ViewModel.SelectedRow, Mode=TwoWay}"
-                      SelectionMode="Single">
-                <ListView.HeaderTemplate>
-                    <DataTemplate>
-                        <Grid Padding="12,8" ColumnSpacing="12"
-                              Background="{ThemeResource LayerFillColorDefaultBrush}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="48" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="140" />
-                                <ColumnDefinition Width="110" />
-                                <ColumnDefinition Width="110" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="N°" FontWeight="SemiBold" />
-                            <TextBlock Grid.Column="1" Text="Titre" FontWeight="SemiBold" />
-                            <TextBlock Grid.Column="2" Text="Catégorie" FontWeight="SemiBold" />
-                            <TextBlock Grid.Column="3" Text="Avant" FontWeight="SemiBold" />
-                            <TextBlock Grid.Column="4" Text="Après" FontWeight="SemiBold" />
-                        </Grid>
-                    </DataTemplate>
-                </ListView.HeaderTemplate>
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="vm:RiskRowViewModel">
-                        <Grid Padding="0,8" ColumnSpacing="12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="48" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="140" />
-                                <ColumnDefinition Width="110" />
-                                <ColumnDefinition Width="110" />
-                            </Grid.ColumnDefinitions>
+                BorderThickness="1,0,0,0"
+                Background="{ThemeResource LayerFillColorDefaultBrush}">
+            <ScrollViewer>
+                <StackPanel Padding="20" Spacing="14">
+                    <Grid>
+                        <TextBlock Text="Détail du risque" VerticalAlignment="Center"
+                                   Style="{StaticResource SubtitleTextBlockStyle}" />
+                        <Button HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Width="32" Height="32" Padding="0"
+                                Background="Transparent" BorderThickness="0"
+                                ToolTipService.ToolTip="Fermer"
+                                Command="{x:Bind ViewModel.CloseDetailCommand}">
+                            <FontIcon Glyph="&#xE711;" FontSize="14" />
+                        </Button>
+                    </Grid>
 
-                            <TextBlock Grid.Column="0" VerticalAlignment="Center"
-                                       Text="{x:Bind RiskNumber}" />
-                            <TextBlock Grid.Column="1" VerticalAlignment="Center"
-                                       Text="{x:Bind Title}" TextTrimming="CharacterEllipsis" />
-                            <TextBlock Grid.Column="2" VerticalAlignment="Center"
-                                       Text="{x:Bind Category}" />
+                    <TextBox Header="Titre"
+                             Text="{x:Bind ViewModel.SelectedRow.Title, Mode=TwoWay}" />
 
-                            <Border Grid.Column="3" HorizontalAlignment="Left"
-                                    CornerRadius="4" Padding="8,2"
-                                    Background="{x:Bind BeforeLevel, Converter={StaticResource LevelBrush}}">
-                                <TextBlock Foreground="White" FontWeight="SemiBold"
-                                           Text="{x:Bind BeforeLevel, Converter={StaticResource LevelLabel}}" />
-                            </Border>
+                    <ComboBox Header="Catégorie" HorizontalAlignment="Stretch"
+                              ItemsSource="{x:Bind ViewModel.Categories}"
+                              SelectedItem="{x:Bind ViewModel.SelectedRow.Category, Mode=TwoWay}" />
 
-                            <Border Grid.Column="4" HorizontalAlignment="Left"
-                                    CornerRadius="4" Padding="8,2"
-                                    Background="{x:Bind AfterLevel, Converter={StaticResource LevelBrush}}">
-                                <TextBlock Foreground="White" FontWeight="SemiBold"
-                                           Text="{x:Bind AfterLevel, Converter={StaticResource LevelLabel}}" />
-                            </Border>
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                    <TextBox Header="Description" TextWrapping="Wrap" AcceptsReturn="True" Height="72"
+                             Text="{x:Bind ViewModel.SelectedRow.Description, Mode=TwoWay}" />
+
+                    <!-- Avant mitigation -->
+                    <TextBlock Text="Avant mitigation" FontWeight="SemiBold"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ComboBox Grid.Column="0" Header="Gravité" HorizontalAlignment="Stretch"
+                                  ItemsSource="{x:Bind ViewModel.SeverityLevels, Mode=OneWay}"
+                                  SelectedIndex="{x:Bind ViewModel.SelectedRow.BeforeSeverityIndex, Mode=TwoWay}" />
+                        <ComboBox Grid.Column="1" Header="Probabilité" HorizontalAlignment="Stretch"
+                                  ItemsSource="{x:Bind ViewModel.LikelihoodLevels, Mode=OneWay}"
+                                  SelectedIndex="{x:Bind ViewModel.SelectedRow.BeforeLikelihoodIndex, Mode=TwoWay}" />
+                    </Grid>
+                    <Border HorizontalAlignment="Left" CornerRadius="4" Padding="10,3"
+                            Background="{x:Bind ViewModel.SelectedRow.BeforeLevel, Mode=OneWay, Converter={StaticResource LevelBrush}}">
+                        <TextBlock Foreground="White" FontWeight="SemiBold"
+                                   Text="{x:Bind ViewModel.SelectedRow.BeforeLevel, Mode=OneWay, Converter={StaticResource LevelLabel}}" />
+                    </Border>
+
+                    <TextBox Header="Stratégie de mitigation" TextWrapping="Wrap" AcceptsReturn="True" Height="72"
+                             Text="{x:Bind ViewModel.SelectedRow.MitigationStrategy, Mode=TwoWay}" />
+
+                    <!-- Après mitigation -->
+                    <TextBlock Text="Après mitigation" FontWeight="SemiBold"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ComboBox Grid.Column="0" Header="Gravité" HorizontalAlignment="Stretch"
+                                  ItemsSource="{x:Bind ViewModel.SeverityLevels, Mode=OneWay}"
+                                  SelectedIndex="{x:Bind ViewModel.SelectedRow.AfterSeverityIndex, Mode=TwoWay}" />
+                        <ComboBox Grid.Column="1" Header="Probabilité" HorizontalAlignment="Stretch"
+                                  ItemsSource="{x:Bind ViewModel.LikelihoodLevels, Mode=OneWay}"
+                                  SelectedIndex="{x:Bind ViewModel.SelectedRow.AfterLikelihoodIndex, Mode=TwoWay}" />
+                    </Grid>
+                    <Border HorizontalAlignment="Left" CornerRadius="4" Padding="10,3"
+                            Background="{x:Bind ViewModel.SelectedRow.AfterLevel, Mode=OneWay, Converter={StaticResource LevelBrush}}">
+                        <TextBlock Foreground="White" FontWeight="SemiBold"
+                                   Text="{x:Bind ViewModel.SelectedRow.AfterLevel, Mode=OneWay, Converter={StaticResource LevelLabel}}" />
+                    </Border>
+
+                    <ToggleSwitch Header="Le projet peut continuer"
+                                  OnContent="Oui" OffContent="Non"
+                                  IsOn="{x:Bind ViewModel.SelectedRow.CanContinue, Mode=TwoWay}" />
+
+                    <Button Content="Enregistrer" HorizontalAlignment="Stretch" Margin="0,4,0,0"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Command="{x:Bind ViewModel.SaveSelectedCommand}" />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Confirmation de sauvegarde (discrète, auto-masquée) -->
+        <Border Grid.Column="0" Grid.ColumnSpan="2"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                Margin="0,0,0,28" Padding="14,7" CornerRadius="14"
+                Background="{ThemeResource ControlFillColorSecondaryBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                Visibility="{x:Bind ViewModel.SavedMessageVisible, Mode=OneWay, Converter={StaticResource BoolToVis}}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon Glyph="&#xE73E;" FontSize="13"
+                          Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <TextBlock Text="Sauvegardé"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
         </Border>
     </Grid>
 </Page>

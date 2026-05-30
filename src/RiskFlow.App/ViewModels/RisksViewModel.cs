@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +13,7 @@ namespace RiskFlow.ViewModels;
 
 /// <summary>
 /// Pilote l'écran du registre des risques pour l'analyse courante : chargement, ajout,
-/// suppression. Les niveaux de risque dépendent du modèle de matrice de l'analyse.
+/// suppression et édition. Les niveaux de risque dépendent du modèle de matrice.
 /// </summary>
 public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFactory) : ObservableObject
 {
@@ -20,8 +22,21 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
 
     public ObservableCollection<RiskRowViewModel> Rows { get; } = [];
 
+    /// <summary>Catégories disponibles (partagées entre analyses).</summary>
+    public ObservableCollection<string> Categories { get; } = [];
+
+    /// <summary>Libellés de gravité du modèle courant (source des listes déroulantes).</summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<string> SeverityLevels { get; set; } = [];
+
+    /// <summary>Libellés de probabilité du modèle courant.</summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<string> LikelihoodLevels { get; set; } = [];
+
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(DeleteRiskCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SaveSelectedCommand))]
+    [NotifyPropertyChangedFor(nameof(HasSelection))]
     public partial RiskRowViewModel? SelectedRow { get; set; }
 
     [ObservableProperty]
@@ -34,7 +49,14 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
     [NotifyCanExecuteChangedFor(nameof(AddRiskCommand))]
     public partial bool HasAnalysis { get; set; }
 
-    /// <summary>Fixe l'analyse affichée et recharge ses risques.</summary>
+    /// <summary>Un risque est sélectionné (le panneau de détail est affiché).</summary>
+    public bool HasSelection => SelectedRow is not null;
+
+    /// <summary>Affiche brièvement la confirmation « Sauvegardé ».</summary>
+    [ObservableProperty]
+    public partial bool SavedMessageVisible { get; set; }
+
+    /// <summary>Fixe l'analyse affichée, recharge ses risques et les catégories.</summary>
     public async Task SetAnalysisAsync(Analysis? analysis)
     {
         _analysis = analysis;
@@ -42,7 +64,24 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
         AnalysisName = analysis?.Name ?? string.Empty;
         ModelName = _model.Name;
         HasAnalysis = analysis is not null;
+        SeverityLevels = _model.SeverityLevels;
+        LikelihoodLevels = _model.LikelihoodLevels;
+
+        await LoadCategoriesAsync();
         await LoadAsync();
+    }
+
+    private async Task LoadCategoriesAsync()
+    {
+        await using var db = await dbFactory.CreateDbContextAsync();
+        var names = await db.RiskCategories
+            .OrderBy(c => c.SortOrder)
+            .Select(c => c.Name)
+            .ToListAsync();
+
+        Categories.Clear();
+        foreach (var name in names)
+            Categories.Add(name);
     }
 
     private async Task LoadAsync()
@@ -79,6 +118,7 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
             AnalysisId = _analysis.Id,
             RiskNumber = nextNumber,
             Title = $"Nouveau risque {nextNumber}",
+            Category = Categories.FirstOrDefault() ?? "Fonctionnel",
             SortOrder = nextOrder,
         };
 
@@ -89,6 +129,32 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
         Rows.Add(row);
         SelectedRow = row;
     }
+
+    [RelayCommand(CanExecute = nameof(HasSelection))]
+    private async Task SaveSelectedAsync()
+    {
+        var row = SelectedRow;
+        if (row is null)
+            return;
+
+        row.ApplyToModel();
+
+        await using (var db = await dbFactory.CreateDbContextAsync())
+        {
+            db.Risks.Update(row.Model);
+            await db.SaveChangesAsync();
+        }
+
+        // Ferme le panneau et affiche brièvement la confirmation.
+        SelectedRow = null;
+        SavedMessageVisible = true;
+        await Task.Delay(TimeSpan.FromSeconds(2));
+        SavedMessageVisible = false;
+    }
+
+    /// <summary>Ferme le panneau de détail (désélectionne le risque courant).</summary>
+    [RelayCommand]
+    private void CloseDetail() => SelectedRow = null;
 
     [RelayCommand(CanExecute = nameof(CanDeleteRisk))]
     private async Task DeleteRiskAsync(RiskRowViewModel? row)
