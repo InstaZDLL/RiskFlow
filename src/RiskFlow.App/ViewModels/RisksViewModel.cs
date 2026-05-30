@@ -52,6 +52,9 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
     /// <summary>Un risque est sélectionné (le panneau de détail est affiché).</summary>
     public bool HasSelection => SelectedRow is not null;
 
+    /// <summary>Modèle de matrice de l'analyse courante (axes + grille de niveaux).</summary>
+    public RiskMatrixModel CurrentModel => _model;
+
     /// <summary>Affiche brièvement la confirmation « Sauvegardé ».</summary>
     [ObservableProperty]
     public partial bool SavedMessageVisible { get; set; }
