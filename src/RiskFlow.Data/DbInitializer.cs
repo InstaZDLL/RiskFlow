@@ -13,6 +13,15 @@ public static class DbInitializer
     {
         await context.Database.MigrateAsync(ct);
 
+        // Normalisation des bases héritées : l'ancienne catégorie par défaut
+        // « Conformité/LPD » est renommée « Conformité » (si la nouvelle n'existe pas déjà).
+        var legacy = await context.RiskCategories.FirstOrDefaultAsync(c => c.Name == "Conformité/LPD", ct);
+        if (legacy is not null && !await context.RiskCategories.AnyAsync(c => c.Name == "Conformité", ct))
+        {
+            legacy.Name = "Conformité";
+            await context.SaveChangesAsync(ct);
+        }
+
         if (!await context.RiskCategories.AnyAsync(ct))
         {
             var order = 0;

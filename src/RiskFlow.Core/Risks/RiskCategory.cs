@@ -20,7 +20,7 @@ public class RiskCategory
         "Sécurité",
         "Organisationnel",
         "Qualité",
-        "Conformité/LPD",
+        "Conformité",
         "Projet",
     ];
 }

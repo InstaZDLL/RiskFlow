@@ -136,7 +136,7 @@
   <data name="Cat_Security" xml:space="preserve"><value>Sécurité</value></data>
   <data name="Cat_Organizational" xml:space="preserve"><value>Organisationnel</value></data>
   <data name="Cat_Quality" xml:space="preserve"><value>Qualité</value></data>
-  <data name="Cat_Compliance" xml:space="preserve"><value>Conformité/LPD</value></data>
+  <data name="Cat_Compliance" xml:space="preserve"><value>Conformité</value></data>
   <data name="Cat_Project" xml:space="preserve"><value>Projet</value></data>
   <data name="Model_3x4" xml:space="preserve"><value>Standard 3×4</value></data>
   <data name="Model_4x4" xml:space="preserve"><value>Étendu 4×4</value></data>

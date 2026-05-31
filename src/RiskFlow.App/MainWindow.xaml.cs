@@ -15,6 +15,9 @@ namespace RiskFlow
         private readonly SettingsService _settings;
         private readonly SettingsViewModel _settingsViewModel;
 
+        /// <summary>Conteneurs de la barre latérale, indexés par analyse (références directes).</summary>
+        private readonly System.Collections.Generic.Dictionary<Analysis, NavigationViewItem> _navItems = new();
+
         public ShellViewModel ViewModel { get; }
 
         public MainWindow(ShellViewModel viewModel, MainPage mainPage, SettingsViewModel settingsViewModel, SettingsService settings)
@@ -34,9 +37,113 @@ namespace RiskFlow
             ApplyTheme();
             _settings.Changed += ApplyTheme;
 
-            // Sélection initiale de l'analyse (le binding SelectedItem a été retiré).
-            Nav.SelectedItem = ViewModel.SelectedAnalysis;
+            // Construit la barre latérale et garde des références directes aux conteneurs :
+            // cela permet de basculer le libellé en numéro de façon fiable quand le menu est
+            // replié (l'API ContainerFromMenuItem est sujette à des problèmes de réalisation).
+            BuildNavItems();
+            ViewModel.Analyses.CollectionChanged += (_, _) => BuildNavItems();
+
+            // Barre repliée → numéros « 1 », « 2 »… ; barre étendue → nom complet.
+            Nav.PaneClosing += (_, _) => ApplyNumberIcons(true);
+            Nav.PaneOpening += (_, _) => ApplyNumberIcons(false);
+            Nav.DisplayModeChanged += (_, _) => ApplyNumberIcons(!Nav.IsPaneOpen);
+            Nav.Loaded += (_, _) => ApplyNumberIcons(!Nav.IsPaneOpen);
         }
+
+        /// <summary>(Re)construit les items de la barre latérale à partir des analyses.</summary>
+        private void BuildNavItems()
+        {
+            _navItems.Clear();
+            Nav.MenuItems.Clear();
+
+            foreach (var analysis in ViewModel.Analyses)
+            {
+                var item = CreateNavItem(analysis);
+                _navItems[analysis] = item;
+                Nav.MenuItems.Add(item);
+            }
+
+            ApplyNumberIcons(!Nav.IsPaneOpen);
+            SelectInNav(ViewModel.SelectedAnalysis);
+        }
+
+        private NavigationViewItem CreateNavItem(Analysis analysis)
+        {
+            // Nom (lié pour se rafraîchir au renommage) + dimensions du modèle en sous-titre.
+            var name = new TextBlock();
+            name.SetBinding(TextBlock.TextProperty, new Microsoft.UI.Xaml.Data.Binding
+            {
+                Path = new PropertyPath(nameof(Analysis.Name)),
+                Source = analysis,
+            });
+
+            var dimensions = new TextBlock
+            {
+                Text = analysis.Model.Dimensions,
+                Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"],
+                Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
+            };
+
+            var content = new StackPanel { Spacing = 0 };
+            content.Children.Add(name);
+            content.Children.Add(dimensions);
+
+            return new NavigationViewItem
+            {
+                Content = content,
+                DataContext = analysis,
+                ContextFlyout = CreateItemFlyout(analysis),
+            };
+        }
+
+        private MenuFlyout CreateItemFlyout(Analysis analysis)
+        {
+            var edit = new MenuFlyoutItem
+            {
+                Text = LanguageManager.Get("Menu_Edit"),
+                Icon = new FontIcon { Glyph = "" },
+                DataContext = analysis,
+            };
+            edit.Click += OnEditAnalysisMenuClick;
+
+            var delete = new MenuFlyoutItem
+            {
+                Text = LanguageManager.Get("Menu_Delete"),
+                Icon = new FontIcon { Glyph = "" },
+                DataContext = analysis,
+            };
+            delete.Click += OnDeleteAnalysisClick;
+
+            var flyout = new MenuFlyout();
+            flyout.Items.Add(edit);
+            flyout.Items.Add(delete);
+            return flyout;
+        }
+
+        /// <summary>Affiche (true) ou retire (false) le numéro d'ordre en icône de chaque analyse.</summary>
+        private void ApplyNumberIcons(bool show)
+        {
+            var i = 0;
+            foreach (var analysis in ViewModel.Analyses)
+            {
+                if (_navItems.TryGetValue(analysis, out var item))
+                {
+                    item.Icon = show
+                        ? new FontIcon
+                        {
+                            Glyph = (i + 1).ToString(),
+                            FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe UI"),
+                            FontSize = 15,
+                        }
+                        : null;
+                }
+                i++;
+            }
+        }
+
+        /// <summary>Sélectionne le conteneur de la barre correspondant à l'analyse donnée.</summary>
+        private void SelectInNav(Analysis? analysis)
+            => Nav.SelectedItem = analysis is not null && _navItems.TryGetValue(analysis, out var item) ? item : null;
 
         private async void OnNavSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
@@ -44,11 +151,11 @@ namespace RiskFlow
             {
                 await ShowSettingsAsync();
                 // Quitte l'item Réglages : revient sur l'analyse courante.
-                Nav.SelectedItem = ViewModel.SelectedAnalysis;
+                SelectInNav(ViewModel.SelectedAnalysis);
                 return;
             }
 
-            if (args.SelectedItem is Analysis analysis)
+            if (args.SelectedItem is NavigationViewItem { DataContext: Analysis analysis })
                 ViewModel.SelectedAnalysis = analysis;
         }
 
@@ -69,7 +176,7 @@ namespace RiskFlow
             {
                 await ViewModel.CreateAnalysisAsync(dialog.AnalysisName, dialog.SelectedModelKey,
                     dialog.Author, dialog.Organization, dialog.ProjectDescription);
-                Nav.SelectedItem = ViewModel.SelectedAnalysis;
+                SelectInNav(ViewModel.SelectedAnalysis);
             }
         }
 
@@ -84,7 +191,7 @@ namespace RiskFlow
             if (analysis is null)
                 return;
 
-            Nav.SelectedItem = analysis;
+            SelectInNav(analysis);
             var dialog = new NewAnalysisDialog { XamlRoot = Content.XamlRoot };
             dialog.ConfigureForEdit(analysis);
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)
@@ -119,7 +226,7 @@ namespace RiskFlow
             if (await confirm.ShowAsync() == ContentDialogResult.Primary)
             {
                 await ViewModel.DeleteAnalysisCommand.ExecuteAsync(analysis);
-                Nav.SelectedItem = ViewModel.SelectedAnalysis;
+                SelectInNav(ViewModel.SelectedAnalysis);
             }
         }
 
@@ -212,7 +319,7 @@ namespace RiskFlow
                 var json = await Windows.Storage.FileIO.ReadTextAsync(file);
                 var dto = AnalysisJson.Deserialize(json);
                 await ViewModel.ImportAnalysisAsync(dto);
-                Nav.SelectedItem = ViewModel.SelectedAnalysis;
+                SelectInNav(ViewModel.SelectedAnalysis);
             }
             catch (System.Exception ex)
             {

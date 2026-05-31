@@ -17,7 +17,8 @@ public static class RiskText
         "Sécurité" => "Cat_Security",
         "Organisationnel" => "Cat_Organizational",
         "Qualité" => "Cat_Quality",
-        "Conformité/LPD" => "Cat_Compliance",
+        "Conformité" => "Cat_Compliance",
+        "Conformité/LPD" => "Cat_Compliance", // base héritée
         "Projet" => "Cat_Project",
         _ => null,
     };
