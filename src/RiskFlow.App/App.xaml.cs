@@ -32,8 +32,10 @@ namespace RiskFlow
             services.AddDbContextFactory<RiskFlowDbContext>(options =>
                 options.UseSqlite(AppPaths.ConnectionString));
 
+            services.AddSingleton<SettingsService>();
             services.AddSingleton<RisksViewModel>();
             services.AddSingleton<ShellViewModel>();
+            services.AddSingleton<SettingsViewModel>();
             services.AddTransient<MainPage>();
             services.AddTransient<MainWindow>();
 

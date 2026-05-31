@@ -3,8 +3,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Text;
-using Microsoft.UI.Xaml.Documents;
 using RiskFlow.Converters;
+using RiskFlow.Services;
 using RiskFlow.ViewModels;
 
 namespace RiskFlow
@@ -13,33 +13,68 @@ namespace RiskFlow
     public sealed partial class MainPage : Page
     {
         private static readonly RiskLevelToBrushConverter LevelBrushConverter = new();
+        private readonly SettingsService _settings;
         private bool _useAfter;
 
         public RisksViewModel ViewModel { get; }
 
-        public MainPage(RisksViewModel viewModel)
+        public MainPage(RisksViewModel viewModel, SettingsService settings)
         {
             ViewModel = viewModel;
+            _settings = settings;
             InitializeComponent();
 
-            // Reconstruit la matrice quand la liste des risques change (ajout, suppression,
-            // changement d'analyse) si la vue Matrice est affichée.
+            // Reconstruit la matrice quand la liste des risques change si elle est affichée.
             ViewModel.Rows.CollectionChanged += (_, _) =>
             {
                 if (MatriceView.Visibility == Visibility.Visible)
                     BuildMatrix();
             };
+
+            ApplySettings();
+            _settings.Changed += ApplySettings;
+        }
+
+        /// <summary>Applique les préférences d'affichage de la matrice (éval, emplacement).</summary>
+        private void ApplySettings()
+        {
+            _useAfter = _settings.Current.MatrixDefaultEvaluation == MatrixEvaluation.After;
+            EvalToggle.IsOn = _useAfter;
+            ApplyPlacement(_settings.Current.MatrixPlacement);
+        }
+
+        private void ApplyPlacement(MatrixPlacement placement)
+        {
+            if (placement == MatrixPlacement.BelowTable)
+            {
+                ViewSelector.Visibility = Visibility.Collapsed;
+                RegistreView.Visibility = Visibility.Visible;
+                Grid.SetRow(MatriceView, 3);
+                MatriceView.MinHeight = 380;
+                MatriceView.Visibility = Visibility.Visible;
+                BuildMatrix();
+            }
+            else
+            {
+                ViewSelector.Visibility = Visibility.Visible;
+                Grid.SetRow(MatriceView, 2);
+                MatriceView.MinHeight = 0;
+                ViewSelector.SelectedItem = RegistreTab; // déclenche OnViewChanged
+            }
         }
 
         private void OnViewChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
         {
+            if (_settings.Current.MatrixPlacement == MatrixPlacement.BelowTable)
+                return; // en mode empilé, le sélecteur est masqué
+
             var matrice = ReferenceEquals(sender.SelectedItem, MatriceTab);
             RegistreView.Visibility = matrice ? Visibility.Collapsed : Visibility.Visible;
             MatriceView.Visibility = matrice ? Visibility.Visible : Visibility.Collapsed;
 
             if (matrice)
             {
-                ViewModel.CloseDetailCommand.Execute(null); // ferme le panneau de détail
+                ViewModel.CloseDetailCommand.Execute(null);
                 BuildMatrix();
             }
         }
@@ -50,7 +85,7 @@ namespace RiskFlow
             BuildMatrix();
         }
 
-        /// <summary>Construit la grille colorée gravité × probabilité avec les numéros de risques.</summary>
+        /// <summary>Construit la grille colorée gravité × probabilité.</summary>
         private void BuildMatrix()
         {
             MatrixHost.Children.Clear();
@@ -61,41 +96,42 @@ namespace RiskFlow
             var nSev = model.SeverityCount;
             var nLik = model.LikelihoodCount;
 
-            // Colonne 0 = libellés de probabilité ; colonnes 1..nSev = gravités.
             MatrixHost.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(96) });
             for (var s = 0; s < nSev; s++)
                 MatrixHost.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(132) });
 
-            // Ligne 0 = libellés de gravité ; lignes 1..nLik = probabilités.
             MatrixHost.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             for (var l = 0; l < nLik; l++)
                 MatrixHost.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-            // En-têtes de gravité (haut).
             for (var s = 0; s < nSev; s++)
                 AddToGrid(HeaderText(model.SeverityLevels[s], center: true), row: 0, column: s + 1);
 
-            // Lignes : probabilité la plus forte en haut.
             for (var rowIdx = 1; rowIdx <= nLik; rowIdx++)
             {
                 var likIndex = nLik - rowIdx;
                 AddToGrid(HeaderText(model.LikelihoodLevels[likIndex], center: false), row: rowIdx, column: 0);
 
                 for (var s = 0; s < nSev; s++)
-                    AddToGrid(BuildCell(model.Level(s, likIndex), CellRiskNumbers(s, likIndex)), row: rowIdx, column: s + 1);
+                    AddToGrid(BuildCell(model.Level(s, likIndex), CellText(s, likIndex)), row: rowIdx, column: s + 1);
             }
         }
 
-        /// <summary>Numéros (« R1, R2 ») des risques tombant sur une cellule gravité × probabilité.</summary>
-        private string CellRiskNumbers(int severityIndex, int likelihoodIndex)
+        /// <summary>Texte d'une cellule : numéros des risques ou compteur, selon les réglages.</summary>
+        private string CellText(int severityIndex, int likelihoodIndex)
         {
-            var numbers = ViewModel.Rows
+            var matching = ViewModel.Rows
                 .Where(r => (_useAfter ? r.AfterSeverityIndex : r.BeforeSeverityIndex) == severityIndex
                          && (_useAfter ? r.AfterLikelihoodIndex : r.BeforeLikelihoodIndex) == likelihoodIndex)
                 .OrderBy(r => r.RiskNumber)
-                .Select(r => $"R{r.RiskNumber}");
+                .ToList();
 
-            return string.Join(", ", numbers);
+            if (matching.Count == 0)
+                return string.Empty;
+
+            return _settings.Current.MatrixCellContent == MatrixCellContent.Count
+                ? matching.Count.ToString()
+                : string.Join(", ", matching.Select(r => $"R{r.RiskNumber}"));
         }
 
         private static Border BuildCell(Core.Risks.RiskLevel level, string content)

@@ -15,11 +15,11 @@
     </Window.SystemBackdrop>
 
     <NavigationView x:Name="Nav"
-                    IsSettingsVisible="False"
+                    IsSettingsVisible="True"
                     IsBackButtonVisible="Collapsed"
                     PaneDisplayMode="Left"
                     MenuItemsSource="{x:Bind ViewModel.Analyses}"
-                    SelectedItem="{x:Bind ViewModel.SelectedAnalysis, Mode=TwoWay}">
+                    SelectionChanged="OnNavSelectionChanged">
 
         <NavigationView.PaneHeader>
             <Button Click="OnNewAnalysisClick"

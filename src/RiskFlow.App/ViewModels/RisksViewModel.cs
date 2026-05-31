@@ -74,6 +74,9 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
         await LoadAsync();
     }
 
+    /// <summary>Recharge les catégories (après modification dans les réglages).</summary>
+    public Task ReloadCategoriesAsync() => LoadCategoriesAsync();
+
     private async Task LoadCategoriesAsync()
     {
         await using var db = await dbFactory.CreateDbContextAsync();
