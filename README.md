@@ -6,13 +6,15 @@
 
 **Native Windows app for project risk analysis and mapping.**
 
-[![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
-[![WinUI 3](https://img.shields.io/badge/WinUI-3-0078D4?logo=windows&logoColor=white)](https://learn.microsoft.com/windows/apps/winui/winui3/)
-[![Windows](https://img.shields.io/badge/Windows-10%2F11-0078D4?logo=windows11&logoColor=white)](#)
-[![EF Core + SQLite](https://img.shields.io/badge/EF%20Core-SQLite-003B57?logo=sqlite&logoColor=white)](https://learn.microsoft.com/ef/core/)
-[![C#](https://img.shields.io/badge/C%23-13-239120?logo=csharp&logoColor=white)](#)
-[![Status](https://img.shields.io/badge/status-in%20development-orange)](#)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue)](LICENSE)
+[![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white&style=for-the-badge)](https://dotnet.microsoft.com/)
+[![WinUI 3](https://img.shields.io/badge/WinUI-3-0078D4?logo=windows&logoColor=white&style=for-the-badge)](https://learn.microsoft.com/windows/apps/winui/winui3/)
+[![Windows](https://img.shields.io/badge/Windows-10%2F11-0078D4?logo=windows11&logoColor=white&style=for-the-badge)](#)
+[![EF Core + SQLite](https://img.shields.io/badge/EF%20Core-SQLite-003B57?logo=sqlite&logoColor=white&style=for-the-badge)](https://learn.microsoft.com/ef/core/)
+[![C#](https://img.shields.io/badge/C%23-13-239120?logo=csharp&logoColor=white&style=for-the-badge)](#)
+[![Status](https://img.shields.io/badge/status-stable-brightgreen?style=for-the-badge)](#)
+[![Latest release](https://img.shields.io/github/v/release/InstaZDLL/RiskFlow?style=for-the-badge)](https://github.com/InstaZDLL/RiskFlow/releases/latest)
+[![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/InstaZDLL/RiskFlow/total?style=for-the-badge)](https://github.com/InstaZDLL/RiskFlow/releases)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge)](LICENSE)
 
 </div>
 
@@ -35,7 +37,7 @@ French (the app targets Swiss TPI projects).
   collapsible sidebar
 - 📐 **Predefined matrix models** — 3×4 (TPI-Flow table), 4×4 and 5×5 (multiplicative scoring)
 - 📋 **Risk register** grouped by category (Functional, Technical, Security, Organizational,
-  Quality, Compliance/LPD, Project)
+  Quality, Compliance, Project)
 - ✏️ **Detail panel** to edit a risk with **live level recalculation** (before/after mitigation,
   mitigation strategy, "can continue" blocker)
 - 🟩🟥 **Visual risk matrix** (Severity × Likelihood) with risk numbers or counts per cell, and a
