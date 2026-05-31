@@ -38,6 +38,8 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(DeleteRiskCommand))]
     [NotifyCanExecuteChangedFor(nameof(SaveSelectedCommand))]
+    [NotifyCanExecuteChangedFor(nameof(MoveRiskUpCommand))]
+    [NotifyCanExecuteChangedFor(nameof(MoveRiskDownCommand))]
     [NotifyPropertyChangedFor(nameof(HasSelection))]
     public partial RiskRowViewModel? SelectedRow { get; set; }
 
@@ -217,6 +219,46 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
     /// <summary>Ferme le panneau de détail (désélectionne le risque courant).</summary>
     [RelayCommand]
     private void CloseDetail() => SelectedRow = null;
+
+    [RelayCommand(CanExecute = nameof(CanMoveUp))]
+    private Task MoveRiskUpAsync()
+    {
+        var index = SelectedRow is null ? -1 : Rows.IndexOf(SelectedRow);
+        if (index <= 0)
+            return Task.CompletedTask;
+
+        Rows.Move(index, index - 1);
+        return RenumberAndPersistAsync();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanMoveDown))]
+    private Task MoveRiskDownAsync()
+    {
+        var index = SelectedRow is null ? -1 : Rows.IndexOf(SelectedRow);
+        if (index < 0 || index >= Rows.Count - 1)
+            return Task.CompletedTask;
+
+        Rows.Move(index, index + 1);
+        return RenumberAndPersistAsync();
+    }
+
+    private bool CanMoveUp() => SelectedRow is not null && Rows.IndexOf(SelectedRow) > 0;
+    private bool CanMoveDown() => SelectedRow is not null && Rows.IndexOf(SelectedRow) < Rows.Count - 1;
+
+    /// <summary>Réaffecte l'ordre et le numéro (1..n) selon la position, puis persiste.</summary>
+    private async Task RenumberAndPersistAsync()
+    {
+        await using var db = await dbFactory.CreateDbContextAsync();
+        for (var i = 0; i < Rows.Count; i++)
+        {
+            Rows[i].SetOrder(i, i + 1);
+            db.Risks.Update(Rows[i].Model);
+        }
+        await db.SaveChangesAsync();
+
+        MoveRiskUpCommand.NotifyCanExecuteChanged();
+        MoveRiskDownCommand.NotifyCanExecuteChanged();
+    }
 
     [RelayCommand(CanExecute = nameof(CanDeleteRisk))]
     private async Task DeleteRiskAsync(RiskRowViewModel? row)

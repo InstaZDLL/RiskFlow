@@ -120,6 +120,12 @@
                     <Button Content="Supprimer"
                             Command="{x:Bind ViewModel.DeleteRiskCommand}"
                             CommandParameter="{x:Bind ViewModel.SelectedRow, Mode=OneWay}" />
+                    <Button ToolTipService.ToolTip="Monter" Command="{x:Bind ViewModel.MoveRiskUpCommand}">
+                        <FontIcon Glyph="&#xE70E;" FontSize="13" />
+                    </Button>
+                    <Button ToolTipService.ToolTip="Descendre" Command="{x:Bind ViewModel.MoveRiskDownCommand}">
+                        <FontIcon Glyph="&#xE70D;" FontSize="13" />
+                    </Button>
                     <Button Click="OnExportPdfClick">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <FontIcon Glyph="&#xE749;" FontSize="14" />
