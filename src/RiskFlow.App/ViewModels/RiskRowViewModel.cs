@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using RiskFlow.Core.Risks;
 
@@ -48,22 +49,34 @@ public partial class RiskRowViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(BeforeLevel))]
+    [NotifyPropertyChangedFor(nameof(BeforeSeverityLabel))]
     public partial int BeforeSeverityIndex { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(BeforeLevel))]
+    [NotifyPropertyChangedFor(nameof(BeforeLikelihoodLabel))]
     public partial int BeforeLikelihoodIndex { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(AfterLevel))]
+    [NotifyPropertyChangedFor(nameof(AfterSeverityLabel))]
     public partial int AfterSeverityIndex { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(AfterLevel))]
+    [NotifyPropertyChangedFor(nameof(AfterLikelihoodLabel))]
     public partial int AfterLikelihoodIndex { get; set; }
 
     public RiskLevel BeforeLevel => _matrix.Level(BeforeSeverityIndex, BeforeLikelihoodIndex);
     public RiskLevel AfterLevel => _matrix.Level(AfterSeverityIndex, AfterLikelihoodIndex);
+
+    public string BeforeSeverityLabel => Label(_matrix.SeverityLevels, BeforeSeverityIndex);
+    public string BeforeLikelihoodLabel => Label(_matrix.LikelihoodLevels, BeforeLikelihoodIndex);
+    public string AfterSeverityLabel => Label(_matrix.SeverityLevels, AfterSeverityIndex);
+    public string AfterLikelihoodLabel => Label(_matrix.LikelihoodLevels, AfterLikelihoodIndex);
+
+    private static string Label(IReadOnlyList<string> levels, int index)
+        => index >= 0 && index < levels.Count ? levels[index] : string.Empty;
 
     /// <summary>Recopie les valeurs éditées dans l'entité avant persistance.</summary>
     public void ApplyToModel()
