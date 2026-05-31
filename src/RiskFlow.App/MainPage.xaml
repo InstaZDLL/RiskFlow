@@ -17,6 +17,15 @@
         <conv:BoolToVisibilityConverter x:Key="BoolToVis" />
         <conv:CanContinueToTextConverter x:Key="ContinueText" />
         <conv:CanContinueToBrushConverter x:Key="ContinueBrush" />
+
+        <Style x:Key="StatCard" TargetType="Border">
+            <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="14,10" />
+            <Setter Property="MinWidth" Value="118" />
+        </Style>
     </Page.Resources>
 
     <Grid ColumnSpacing="0">
@@ -52,6 +61,42 @@
                     <Run Text="modèle" />
                     <Run Text="{x:Bind ViewModel.ModelName, Mode=OneWay}" />
                 </TextBlock>
+
+                <!-- Cartes de synthèse -->
+                <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,12,0,0">
+                    <Border Style="{StaticResource StatCard}">
+                        <StackPanel>
+                            <TextBlock Text="{x:Bind ViewModel.TotalRisks, Mode=OneWay}"
+                                       FontSize="24" FontWeight="SemiBold" />
+                            <TextBlock Text="Risques" Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource StatCard}">
+                        <StackPanel>
+                            <TextBlock Text="{x:Bind ViewModel.CriticalCount, Mode=OneWay}"
+                                       FontSize="24" FontWeight="SemiBold" Foreground="#DC2626" />
+                            <TextBlock Text="Critiques" Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource StatCard}">
+                        <StackPanel>
+                            <TextBlock Text="{x:Bind ViewModel.HighCount, Mode=OneWay}"
+                                       FontSize="24" FontWeight="SemiBold" Foreground="#F97316" />
+                            <TextBlock Text="Élevés" Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource StatCard}">
+                        <StackPanel>
+                            <TextBlock Text="{x:Bind ViewModel.BlockedCount, Mode=OneWay}"
+                                       FontSize="24" FontWeight="SemiBold" Foreground="#6B7280" />
+                            <TextBlock Text="Non poursuivables" Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
             </StackPanel>
 
             <!-- Sélecteur de vue -->

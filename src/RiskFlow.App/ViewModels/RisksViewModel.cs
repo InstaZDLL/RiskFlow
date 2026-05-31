@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -38,6 +39,12 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
     [NotifyCanExecuteChangedFor(nameof(SaveSelectedCommand))]
     [NotifyPropertyChangedFor(nameof(HasSelection))]
     public partial RiskRowViewModel? SelectedRow { get; set; }
+
+    // ----- Cartes de synthèse (niveaux avant mitigation, comme TPI-Flow) -----
+    [ObservableProperty] public partial int TotalRisks { get; set; }
+    [ObservableProperty] public partial int CriticalCount { get; set; }
+    [ObservableProperty] public partial int HighCount { get; set; }
+    [ObservableProperty] public partial int BlockedCount { get; set; }
 
     [ObservableProperty]
     public partial string AnalysisName { get; set; } = string.Empty;
@@ -103,10 +110,16 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
 
     private async Task LoadAsync()
     {
+        foreach (var row in Rows)
+            row.PropertyChanged -= OnRowChanged;
         Rows.Clear();
         SelectedRow = null;
+
         if (_analysis is null)
+        {
+            RecomputeStats();
             return;
+        }
 
         await using var db = await dbFactory.CreateDbContextAsync();
         var items = await db.Risks
@@ -116,7 +129,27 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
             .ToListAsync();
 
         foreach (var risk in items)
-            Rows.Add(new RiskRowViewModel(risk, _model));
+        {
+            var row = new RiskRowViewModel(risk, _model);
+            row.PropertyChanged += OnRowChanged;
+            Rows.Add(row);
+        }
+
+        RecomputeStats();
+    }
+
+    private void OnRowChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(RiskRowViewModel.BeforeLevel) or nameof(RiskRowViewModel.CanContinue))
+            RecomputeStats();
+    }
+
+    private void RecomputeStats()
+    {
+        TotalRisks = Rows.Count;
+        CriticalCount = Rows.Count(r => r.BeforeLevel == RiskLevel.Extreme);
+        HighCount = Rows.Count(r => r.BeforeLevel == RiskLevel.High);
+        BlockedCount = Rows.Count(r => !r.CanContinue);
     }
 
     [RelayCommand(CanExecute = nameof(HasAnalysis))]
@@ -143,8 +176,10 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
         await db.SaveChangesAsync();
 
         var row = new RiskRowViewModel(risk, _model);
+        row.PropertyChanged += OnRowChanged;
         Rows.Add(row);
         SelectedRow = row;
+        RecomputeStats();
     }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
@@ -184,7 +219,9 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
         db.Risks.Remove(row.Model);
         await db.SaveChangesAsync();
 
+        row.PropertyChanged -= OnRowChanged;
         Rows.Remove(row);
+        RecomputeStats();
     }
 
     private bool CanDeleteRisk(RiskRowViewModel? row) => (row ?? SelectedRow) is not null;

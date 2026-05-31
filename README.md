@@ -1,104 +1,110 @@
 <div align="center">
 
-<img src="assets/logo.png" alt="Logo RiskFlow" width="128" />
+<img src="assets/logo.png" alt="RiskFlow logo" width="128" />
 
 # RiskFlow
 
-**Analyse et cartographie des risques projet — application Windows native.**
+**Native Windows app for project risk analysis and mapping.**
 
 [![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![WinUI 3](https://img.shields.io/badge/WinUI-3-0078D4?logo=windows&logoColor=white)](https://learn.microsoft.com/windows/apps/winui/winui3/)
 [![Windows](https://img.shields.io/badge/Windows-10%2F11-0078D4?logo=windows11&logoColor=white)](#)
 [![EF Core + SQLite](https://img.shields.io/badge/EF%20Core-SQLite-003B57?logo=sqlite&logoColor=white)](https://learn.microsoft.com/ef/core/)
 [![C#](https://img.shields.io/badge/C%23-13-239120?logo=csharp&logoColor=white)](#)
-[![Statut](https://img.shields.io/badge/statut-en%20d%C3%A9veloppement-orange)](#)
+[![Status](https://img.shields.io/badge/status-in%20development-orange)](#)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue)](LICENSE)
 
 </div>
 
 ---
 
-## Présentation
+## Overview
 
-**RiskFlow** est une application de bureau Windows **100 % autonome** (runtime .NET et Windows
-App SDK embarqués : aucune installation préalable requise) dédiée à l'**analyse des risques
-projet**. Elle reprend et étend le module d'analyse des risques de
-[TPI-Flow](https://tpiflow.ch) sous la forme d'un exécutable natif, hors-ligne et local.
+**RiskFlow** is a **fully self-contained** Windows desktop application (the .NET runtime and
+the Windows App SDK are bundled — no prior installation required) dedicated to **project risk
+analysis**. It reimagines and extends the risk-analysis module of
+[TPI-Flow](https://tpiflow.ch) as a native, offline, local executable.
 
-Chaque risque est évalué **avant** et **après** mitigation selon une matrice
-*Gravité × Probabilité*, qui en déduit automatiquement un niveau
-(**Bas / Moyen / Élevé / Critique**).
+Each risk is assessed **before** and **after** mitigation against a *Severity × Likelihood*
+matrix, which automatically derives a level (**Low / Medium / High / Critical**). The UI is in
+French (the app targets Swiss TPI projects).
 
-## Fonctionnalités
+## Features
 
-- 📋 **Registre des risques** classés par catégorie (Fonctionnel, Technique, Sécurité,
-  Organisationnel, Qualité, Conformité/LPD, Projet)
-- 🎯 **Double évaluation** avant / après mitigation (gravité × probabilité → niveau calculé)
-- 🟩🟥 **Niveaux de risque** colorés, calculés via la même matrice que TPI-Flow
-- 💾 **Stockage local** SQLite (`%LOCALAPPDATA%\RiskFlow\riskflow.db`)
-- 🔌 **Interopérabilité** prévue avec l'import/export de TPI-Flow
+- 🗂️ **Multiple analyses** — manage several risk registers and switch between them from a
+  collapsible sidebar
+- 📐 **Predefined matrix models** — 3×4 (TPI-Flow table), 4×4 and 5×5 (multiplicative scoring)
+- 📋 **Risk register** grouped by category (Functional, Technical, Security, Organizational,
+  Quality, Compliance/LPD, Project)
+- ✏️ **Detail panel** to edit a risk with **live level recalculation** (before/after mitigation,
+  mitigation strategy, "can continue" blocker)
+- 🟩🟥 **Visual risk matrix** (Severity × Likelihood) with risk numbers or counts per cell, and a
+  before/after toggle
+- 📊 **Summary cards** — total, critical, high and non-continuable risks
+- 📄 **PDF export** (QuestPDF) — header, detailed table and before/after matrices
+- ⚙️ **Settings** — theme (system/light/dark), matrix display options, report identity, category
+  management
+- 💾 **Local storage** with SQLite (`%LOCALAPPDATA%\RiskFlow\riskflow.db`)
 
-> 🚧 En cours de développement. Déjà disponible : registre des risques (liste, ajout,
-> suppression) avec calcul automatique des niveaux avant/après.
+## Tech stack
 
-## Stack technique
-
-| Couche | Technologie |
-|--------|-------------|
-| Interface | WinUI 3 (Windows App SDK) + MVVM (CommunityToolkit.Mvvm) |
-| Injection de dépendances | Microsoft.Extensions.DependencyInjection |
+| Layer | Technology |
+|-------|------------|
+| UI | WinUI 3 (Windows App SDK) + MVVM (CommunityToolkit.Mvvm) |
+| Dependency injection | Microsoft.Extensions.DependencyInjection |
 | Runtime | .NET 10 — `net10.0-windows10.0.19041.0` |
-| Données | EF Core + SQLite |
-| Packaging | Exécutable **non packagé** (`.exe`), runtime **bundlé** (self-contained) |
+| Data | EF Core + SQLite |
+| PDF | QuestPDF |
+| Packaging | **Unpackaged** executable (`.exe`), **bundled** runtime (self-contained) |
 
-## Structure du dépôt
+## Repository layout
 
 ```text
-RiskFlow.slnx                Solution (3 projets)
+RiskFlow.slnx                Solution (3 projects)
 src/
-  RiskFlow.App/              Application WinUI 3 (UI, ViewModels, DI)
-  RiskFlow.Core/             Domaine métier (enums, matrice, entités) — net10.0 pur
+  RiskFlow.App/              WinUI 3 application (UI, ViewModels, DI)
+  RiskFlow.Core/             Domain (enums, matrix models, entities) — pure net10.0
   RiskFlow.Data/             EF Core + SQLite (DbContext, migrations, seed)
 ```
 
-`RiskFlow.Core` ne dépend ni de WinUI ni d'EF Core : la logique métier (notamment
-`RiskCalculator`, port fidèle de `risk-logic.ts`) reste testable de façon isolée.
+`RiskFlow.Core` depends on neither WinUI nor EF Core: the business logic (notably
+`RiskMatrixModels`, a faithful port of `risk-logic.ts`) stays testable in isolation.
 
-## Prérequis
+## Requirements
 
-- Windows 10 (1809+) ou Windows 11
+- Windows 10 (1809+) or Windows 11
 - [.NET SDK 10](https://dotnet.microsoft.com/download/dotnet/10.0)
 
-## Développement
+## Development
 
 ```powershell
-# Restaurer les outils (dotnet-ef) et compiler
+# Restore tools (dotnet-ef) and build
 dotnet tool restore
 dotnet build -p:Platform=x64
 
-# Lancer l'application
+# Run the app
 dotnet run --project src/RiskFlow.App/RiskFlow.csproj -p:Platform=x64
 ```
 
-### Base de données (EF Core)
+### Database (EF Core)
 
 ```powershell
-# Ajouter une migration
-dotnet dotnet-ef migrations add <Nom> --project src/RiskFlow.Data/RiskFlow.Data.csproj
+# Add a migration
+dotnet dotnet-ef migrations add <Name> --project src/RiskFlow.Data/RiskFlow.Data.csproj
 ```
 
-Les migrations sont appliquées automatiquement au démarrage (`DbInitializer`).
+Migrations are applied automatically at startup (`DbInitializer`).
 
-## Publication (exécutable autonome)
+## Publishing (standalone executable)
 
-Produit un dossier xcopy-déployable contenant `RiskFlow.exe` et tout le runtime :
+Produces an xcopy-deployable folder containing `RiskFlow.exe` and the whole runtime:
 
 ```powershell
 dotnet publish src/RiskFlow.App/RiskFlow.csproj -c Release -r win-x64 -p:Platform=x64
 # → bin/x64/Release/net10.0-windows10.0.19041.0/win-x64/publish/RiskFlow.exe
 ```
 
-## Licence
+## License
 
 Copyright 2026 InstaZDLL
 
@@ -114,4 +120,4 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-Voir le fichier [LICENSE](LICENSE) pour le texte complet.
+See the [LICENSE](LICENSE) file for the full text.
