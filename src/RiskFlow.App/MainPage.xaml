@@ -17,6 +17,7 @@
         <conv:BoolToVisibilityConverter x:Key="BoolToVis" />
         <conv:CanContinueToTextConverter x:Key="ContinueText" />
         <conv:CanContinueToBrushConverter x:Key="ContinueBrush" />
+        <local:BindingProxy x:Key="VmProxy" />
 
         <Style x:Key="StatCard" TargetType="Border">
             <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
@@ -125,6 +126,13 @@
                             <TextBlock Text="Exporter PDF" />
                         </StackPanel>
                     </Button>
+                    <ToggleButton IsChecked="{x:Bind ViewModel.ShowDescriptions, Mode=TwoWay}"
+                                  ToolTipService.ToolTip="Afficher les colonnes Description et Stratégie">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE7B3;" FontSize="14" />
+                            <TextBlock Text="Descriptions" />
+                        </StackPanel>
+                    </ToggleButton>
                 </StackPanel>
 
                 <Border Grid.Row="1"
@@ -151,11 +159,11 @@
                                         <ColumnDefinition Width="44" />
                                         <ColumnDefinition Width="180" />
                                         <ColumnDefinition Width="120" />
-                                        <ColumnDefinition Width="240" />
+                                        <ColumnDefinition Width="{Binding Data.TextColumnWidth, Source={StaticResource VmProxy}}" />
                                         <ColumnDefinition Width="100" />
                                         <ColumnDefinition Width="110" />
                                         <ColumnDefinition Width="90" />
-                                        <ColumnDefinition Width="240" />
+                                        <ColumnDefinition Width="{Binding Data.TextColumnWidth, Source={StaticResource VmProxy}}" />
                                         <ColumnDefinition Width="100" />
                                         <ColumnDefinition Width="110" />
                                         <ColumnDefinition Width="90" />
@@ -187,11 +195,13 @@
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="N°" FontWeight="SemiBold" />
                                     <TextBlock Grid.Row="1" Grid.Column="1" Text="Titre" FontWeight="SemiBold" />
                                     <TextBlock Grid.Row="1" Grid.Column="2" Text="Catégorie" FontWeight="SemiBold" />
-                                    <TextBlock Grid.Row="1" Grid.Column="3" Text="Description" FontWeight="SemiBold" />
+                                    <TextBlock Grid.Row="1" Grid.Column="3" Text="Description" FontWeight="SemiBold"
+                                               Visibility="{Binding Data.TextColumnVisibility, Source={StaticResource VmProxy}}" />
                                     <TextBlock Grid.Row="1" Grid.Column="4" Text="Gravité" FontWeight="SemiBold" />
                                     <TextBlock Grid.Row="1" Grid.Column="5" Text="Probabilité" FontWeight="SemiBold" />
                                     <TextBlock Grid.Row="1" Grid.Column="6" Text="Niveau" FontWeight="SemiBold" />
-                                    <TextBlock Grid.Row="1" Grid.Column="7" Text="Stratégie" FontWeight="SemiBold" />
+                                    <TextBlock Grid.Row="1" Grid.Column="7" Text="Stratégie" FontWeight="SemiBold"
+                                               Visibility="{Binding Data.TextColumnVisibility, Source={StaticResource VmProxy}}" />
                                     <TextBlock Grid.Row="1" Grid.Column="8" Text="Gravité" FontWeight="SemiBold" />
                                     <TextBlock Grid.Row="1" Grid.Column="9" Text="Probabilité" FontWeight="SemiBold" />
                                     <TextBlock Grid.Row="1" Grid.Column="10" Text="Niveau" FontWeight="SemiBold" />
@@ -207,11 +217,11 @@
                                         <ColumnDefinition Width="44" />
                                         <ColumnDefinition Width="180" />
                                         <ColumnDefinition Width="120" />
-                                        <ColumnDefinition Width="240" />
+                                        <ColumnDefinition Width="{Binding Data.TextColumnWidth, Source={StaticResource VmProxy}}" />
                                         <ColumnDefinition Width="100" />
                                         <ColumnDefinition Width="110" />
                                         <ColumnDefinition Width="90" />
-                                        <ColumnDefinition Width="240" />
+                                        <ColumnDefinition Width="{Binding Data.TextColumnWidth, Source={StaticResource VmProxy}}" />
                                         <ColumnDefinition Width="100" />
                                         <ColumnDefinition Width="110" />
                                         <ColumnDefinition Width="90" />
@@ -226,6 +236,7 @@
                                                Text="{x:Bind Category, Mode=OneWay}" />
                                     <TextBlock Grid.Column="3" VerticalAlignment="Top" TextWrapping="Wrap"
                                                FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                               Visibility="{Binding Data.TextColumnVisibility, Source={StaticResource VmProxy}}"
                                                Text="{x:Bind Description, Mode=OneWay}" />
 
                                     <TextBlock Grid.Column="4" VerticalAlignment="Top"
@@ -241,6 +252,7 @@
 
                                     <TextBlock Grid.Column="7" VerticalAlignment="Top" TextWrapping="Wrap"
                                                FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                               Visibility="{Binding Data.TextColumnVisibility, Source={StaticResource VmProxy}}"
                                                Text="{x:Bind MitigationStrategy, Mode=OneWay}" />
 
                                     <TextBlock Grid.Column="8" VerticalAlignment="Top"

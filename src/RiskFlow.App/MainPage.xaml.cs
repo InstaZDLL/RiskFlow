@@ -29,6 +29,7 @@ namespace RiskFlow
             ViewModel = viewModel;
             _settings = settings;
             InitializeComponent();
+            ((BindingProxy)Resources["VmProxy"]).Data = ViewModel;
 
             // Reconstruit la matrice quand la liste des risques change si elle est affichée.
             ViewModel.Rows.CollectionChanged += (_, _) =>

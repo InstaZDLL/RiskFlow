@@ -68,11 +68,17 @@ namespace RiskFlow
         }
 
         private async void OnEditAnalysisRequested(object? sender, System.EventArgs e)
+            => await EditAnalysisAsync(ViewModel.SelectedAnalysis);
+
+        private async void OnEditAnalysisMenuClick(object sender, RoutedEventArgs e)
+            => await EditAnalysisAsync(AnalysisFrom(sender));
+
+        private async System.Threading.Tasks.Task EditAnalysisAsync(Analysis? analysis)
         {
-            var analysis = ViewModel.SelectedAnalysis;
             if (analysis is null)
                 return;
 
+            Nav.SelectedItem = analysis;
             var dialog = new NewAnalysisDialog { XamlRoot = Content.XamlRoot };
             dialog.ConfigureForEdit(analysis);
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)
@@ -81,6 +87,47 @@ namespace RiskFlow
                     dialog.Author, dialog.Organization, dialog.ProjectDescription);
             }
         }
+
+        private async void OnDeleteAnalysisClick(object sender, RoutedEventArgs e)
+        {
+            var analysis = AnalysisFrom(sender) ?? ViewModel.SelectedAnalysis;
+            if (analysis is null)
+                return;
+
+            if (ViewModel.Analyses.Count <= 1)
+            {
+                await ShowInfoAsync("Impossible de supprimer la dernière analyse.");
+                return;
+            }
+
+            var confirm = new ContentDialog
+            {
+                Title = "Supprimer l'analyse",
+                Content = $"Supprimer « {analysis.Name} » et tous ses risques ? Cette action est irréversible.",
+                PrimaryButtonText = "Supprimer",
+                CloseButtonText = "Annuler",
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = Content.XamlRoot,
+            };
+
+            if (await confirm.ShowAsync() == ContentDialogResult.Primary)
+            {
+                await ViewModel.DeleteAnalysisCommand.ExecuteAsync(analysis);
+                Nav.SelectedItem = ViewModel.SelectedAnalysis;
+            }
+        }
+
+        private static Analysis? AnalysisFrom(object sender)
+            => (sender as FrameworkElement)?.DataContext as Analysis;
+
+        private System.Threading.Tasks.Task ShowInfoAsync(string message)
+            => new ContentDialog
+            {
+                Title = "RiskFlow",
+                Content = message,
+                CloseButtonText = "OK",
+                XamlRoot = Content.XamlRoot,
+            }.ShowAsync().AsTask();
 
         private async void OnExportPdfRequested(object? sender, System.EventArgs e)
         {

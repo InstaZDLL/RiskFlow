@@ -37,6 +37,20 @@
         <NavigationView.MenuItemTemplate>
             <DataTemplate x:DataType="risks:Analysis">
                 <StackPanel Spacing="0">
+                    <StackPanel.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Modifier…" Click="OnEditAnalysisMenuClick">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE70F;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutItem Text="Supprimer" Click="OnDeleteAnalysisClick">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE74D;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                        </MenuFlyout>
+                    </StackPanel.ContextFlyout>
                     <TextBlock Text="{x:Bind Name, Mode=OneWay}" />
                     <TextBlock Text="{x:Bind Model.Dimensions}"
                                Style="{StaticResource CaptionTextBlockStyle}"

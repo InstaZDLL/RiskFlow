@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.UI.Xaml;
 using RiskFlow.Core.Risks;
 using RiskFlow.Data;
 
@@ -39,6 +40,15 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
     [NotifyCanExecuteChangedFor(nameof(SaveSelectedCommand))]
     [NotifyPropertyChangedFor(nameof(HasSelection))]
     public partial RiskRowViewModel? SelectedRow { get; set; }
+
+    /// <summary>Affiche les colonnes Description et Stratégie du tableau (masquées par défaut).</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TextColumnWidth))]
+    [NotifyPropertyChangedFor(nameof(TextColumnVisibility))]
+    public partial bool ShowDescriptions { get; set; }
+
+    public GridLength TextColumnWidth => ShowDescriptions ? new GridLength(240) : new GridLength(0);
+    public Visibility TextColumnVisibility => ShowDescriptions ? Visibility.Visible : Visibility.Collapsed;
 
     // ----- Cartes de synthèse (niveaux avant mitigation, comme TPI-Flow) -----
     [ObservableProperty] public partial int TotalRisks { get; set; }
