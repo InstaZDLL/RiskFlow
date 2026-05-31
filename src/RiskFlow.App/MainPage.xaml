@@ -138,6 +138,12 @@
                             <TextBlock Text="Exporter Excel" />
                         </StackPanel>
                     </Button>
+                    <Button Click="OnExportJsonClick">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE8E5;" FontSize="14" />
+                            <TextBlock Text="Exporter JSON" />
+                        </StackPanel>
+                    </Button>
                     <ToggleButton IsChecked="{x:Bind ViewModel.ShowDescriptions, Mode=TwoWay}"
                                   ToolTipService.ToolTip="Afficher les colonnes Description et Stratégie">
                         <StackPanel Orientation="Horizontal" Spacing="6">

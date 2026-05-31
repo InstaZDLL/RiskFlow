@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -98,6 +99,51 @@ public partial class ShellViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
 
     private static string? Normalize(string? value)
         => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    /// <summary>Importe une analyse depuis un DTO : crée une nouvelle analyse + ses risques.</summary>
+    public async Task ImportAnalysisAsync(Services.AnalysisExportDto dto)
+    {
+        var model = RiskMatrixModels.Get(dto.ModelKey);
+        var maxSev = model.SeverityCount - 1;
+        var maxLik = model.LikelihoodCount - 1;
+        var nextOrder = Analyses.Count == 0 ? 0 : Analyses.Max(a => a.SortOrder) + 1;
+
+        var analysis = new Analysis
+        {
+            Name = string.IsNullOrWhiteSpace(dto.Name) ? $"Analyse {Analyses.Count + 1}" : dto.Name.Trim(),
+            ModelKey = model.Key,
+            Author = Normalize(dto.Author),
+            Organization = Normalize(dto.Organization),
+            ProjectDescription = Normalize(dto.ProjectDescription),
+            SortOrder = nextOrder,
+        };
+
+        var order = 0;
+        foreach (var r in dto.Risks.OrderBy(r => r.SortOrder).ThenBy(r => r.RiskNumber))
+        {
+            analysis.Risks.Add(new Risk
+            {
+                RiskNumber = r.RiskNumber <= 0 ? order + 1 : r.RiskNumber,
+                Title = r.Title,
+                Category = string.IsNullOrWhiteSpace(r.Category) ? "Fonctionnel" : r.Category,
+                Description = r.Description,
+                BeforeSeverityIndex = Math.Clamp(r.BeforeSeverityIndex, 0, maxSev),
+                BeforeLikelihoodIndex = Math.Clamp(r.BeforeLikelihoodIndex, 0, maxLik),
+                MitigationStrategy = r.MitigationStrategy,
+                AfterSeverityIndex = Math.Clamp(r.AfterSeverityIndex, 0, maxSev),
+                AfterLikelihoodIndex = Math.Clamp(r.AfterLikelihoodIndex, 0, maxLik),
+                CanContinue = r.CanContinue,
+                SortOrder = order++,
+            });
+        }
+
+        await using var db = await dbFactory.CreateDbContextAsync();
+        db.Analyses.Add(analysis);
+        await db.SaveChangesAsync();
+
+        Analyses.Add(analysis);
+        SelectedAnalysis = analysis;
+    }
 
     [RelayCommand(CanExecute = nameof(CanDeleteAnalysis))]
     private async Task DeleteAnalysisAsync(Analysis? analysis)

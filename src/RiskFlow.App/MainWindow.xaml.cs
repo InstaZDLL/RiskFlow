@@ -28,6 +28,7 @@ namespace RiskFlow
             mainPage.EditAnalysisRequested += OnEditAnalysisRequested;
             mainPage.ExportPdfRequested += OnExportPdfRequested;
             mainPage.ExportExcelRequested += OnExportExcelRequested;
+            mainPage.ExportJsonRequested += OnExportJsonRequested;
 
             SetWindowIcon();
             ApplyTheme();
@@ -165,6 +166,54 @@ namespace RiskFlow
             var bytes = generate(analysis, risks, model, author, organization, System.DateTimeOffset.Now);
             await Windows.Storage.FileIO.WriteBytesAsync(file, bytes);
             await Windows.System.Launcher.LaunchFileAsync(file);
+        }
+
+        private async void OnExportJsonRequested(object? sender, System.EventArgs e)
+        {
+            var analysis = ViewModel.SelectedAnalysis;
+            if (analysis is null)
+                return;
+
+            var picker = new Windows.Storage.Pickers.FileSavePicker
+            {
+                SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary,
+                SuggestedFileName = SafeFileName(analysis.Name),
+            };
+            picker.FileTypeChoices.Add("Analyse RiskFlow (JSON)", new System.Collections.Generic.List<string> { ".json" });
+            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
+
+            var file = await picker.PickSaveFileAsync();
+            if (file is null)
+                return;
+
+            var json = AnalysisJson.Serialize(analysis, ViewModel.Risks.SnapshotForExport(), System.DateTimeOffset.Now);
+            await Windows.Storage.FileIO.WriteTextAsync(file, json);
+        }
+
+        private async void OnImportClick(object sender, RoutedEventArgs e)
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker
+            {
+                SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary,
+            };
+            picker.FileTypeFilter.Add(".json");
+            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
+
+            var file = await picker.PickSingleFileAsync();
+            if (file is null)
+                return;
+
+            try
+            {
+                var json = await Windows.Storage.FileIO.ReadTextAsync(file);
+                var dto = AnalysisJson.Deserialize(json);
+                await ViewModel.ImportAnalysisAsync(dto);
+                Nav.SelectedItem = ViewModel.SelectedAnalysis;
+            }
+            catch (System.Exception ex)
+            {
+                await ShowInfoAsync($"Import impossible : {ex.Message}");
+            }
         }
 
         private static string FirstNonEmpty(string? a, string? b)
