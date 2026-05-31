@@ -22,7 +22,7 @@
                 <RadioButtons.ItemTemplate>
                     <DataTemplate x:DataType="risks:RiskMatrixModel">
                         <StackPanel Spacing="0">
-                            <TextBlock Text="{Binding Name, Converter={StaticResource L}}" />
+                            <TextBlock Text="{x:Bind Name, Converter={StaticResource L}}" />
                             <TextBlock Text="{x:Bind Dimensions}"
                                        Style="{StaticResource CaptionTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />

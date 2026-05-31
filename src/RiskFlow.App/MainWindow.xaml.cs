@@ -269,14 +269,21 @@ namespace RiskFlow
             if (file is null)
                 return;
 
-            var risks = ViewModel.Risks.SnapshotForExport();
-            var model = ViewModel.Risks.CurrentModel;
-            var author = FirstNonEmpty(analysis.Author, _settings.Current.ReportAuthor);
-            var organization = FirstNonEmpty(analysis.Organization, _settings.Current.ReportOrganization);
+            try
+            {
+                var risks = ViewModel.Risks.SnapshotForExport();
+                var model = ViewModel.Risks.CurrentModel;
+                var author = FirstNonEmpty(analysis.Author, _settings.Current.ReportAuthor);
+                var organization = FirstNonEmpty(analysis.Organization, _settings.Current.ReportOrganization);
 
-            var bytes = generate(analysis, risks, model, author, organization, System.DateTimeOffset.Now);
-            await Windows.Storage.FileIO.WriteBytesAsync(file, bytes);
-            await Windows.System.Launcher.LaunchFileAsync(file);
+                var bytes = generate(analysis, risks, model, author, organization, System.DateTimeOffset.Now);
+                await Windows.Storage.FileIO.WriteBytesAsync(file, bytes);
+                await Windows.System.Launcher.LaunchFileAsync(file);
+            }
+            catch (System.Exception ex)
+            {
+                await ShowInfoAsync(string.Format(RiskFlow.Services.LanguageManager.Get("Msg_ExportError"), ex.Message));
+            }
         }
 
         private async void OnExportJsonRequested(object? sender, System.EventArgs e)
@@ -297,8 +304,15 @@ namespace RiskFlow
             if (file is null)
                 return;
 
-            var json = AnalysisJson.Serialize(analysis, ViewModel.Risks.SnapshotForExport(), System.DateTimeOffset.Now);
-            await Windows.Storage.FileIO.WriteTextAsync(file, json);
+            try
+            {
+                var json = AnalysisJson.Serialize(analysis, ViewModel.Risks.SnapshotForExport(), System.DateTimeOffset.Now);
+                await Windows.Storage.FileIO.WriteTextAsync(file, json);
+            }
+            catch (System.Exception ex)
+            {
+                await ShowInfoAsync(string.Format(RiskFlow.Services.LanguageManager.Get("Msg_ExportError"), ex.Message));
+            }
         }
 
         private async void OnImportClick(object sender, RoutedEventArgs e)

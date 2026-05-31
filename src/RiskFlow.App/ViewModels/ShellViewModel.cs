@@ -41,10 +41,33 @@ public partial class ShellViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
         SelectedAnalysis = Analyses.FirstOrDefault();
     }
 
+    private System.Threading.CancellationTokenSource? _loadCts;
+
     partial void OnSelectedAnalysisChanged(Analysis? value)
     {
-        // Fire-and-forget : le rechargement met à jour les collections observées par l'UI.
-        _ = risks.SetAnalysisAsync(value);
+        // Annule un éventuel rechargement précédent (sélection remplacée par une plus récente).
+        // Le CTS n'est pas disposé ici : son opération l'utilise encore. Chaque exécution
+        // dispose le sien dans son finally, une fois le travail terminé (évite ObjectDisposedException).
+        _loadCts?.Cancel();
+        var cts = new System.Threading.CancellationTokenSource();
+        _loadCts = cts;
+        _ = LoadSelectedAsync(value, cts);
+    }
+
+    private async Task LoadSelectedAsync(Analysis? value, System.Threading.CancellationTokenSource cts)
+    {
+        try
+        {
+            await risks.SetAnalysisAsync(value, cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // Rechargement abandonné au profit d'une sélection plus récente.
+        }
+        finally
+        {
+            cts.Dispose();
+        }
     }
 
     /// <summary>Crée une analyse, l'ajoute à la liste et la sélectionne.</summary>

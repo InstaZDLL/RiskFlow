@@ -52,7 +52,13 @@ namespace RiskFlow
         private void ApplySettings()
         {
             _useAfter = _settings.Current.MatrixDefaultEvaluation == MatrixEvaluation.After;
+
+            // Met à jour l'état du toggle sans déclencher Toggled : ApplyPlacement reconstruit
+            // la matrice juste après, on évite ainsi un BuildMatrix redondant.
+            EvalToggle.Toggled -= OnEvalToggled;
             EvalToggle.IsOn = _useAfter;
+            EvalToggle.Toggled += OnEvalToggled;
+
             ApplyPlacement(_settings.Current.MatrixPlacement);
         }
 

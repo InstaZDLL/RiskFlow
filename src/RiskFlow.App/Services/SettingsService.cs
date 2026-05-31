@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -50,10 +48,19 @@ public sealed class SettingsService
         return new AppSettings();
     }
 
-    /// <summary>Persiste les préférences courantes et notifie les abonnés.</summary>
+    /// <summary>Persiste les préférences courantes et notifie les abonnés (uniquement si l'écriture réussit).</summary>
     public void Save()
     {
-        File.WriteAllText(_path, JsonSerializer.Serialize(Current, JsonOptions));
+        try
+        {
+            File.WriteAllText(_path, JsonSerializer.Serialize(Current, JsonOptions));
+        }
+        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException)
+        {
+            System.Diagnostics.Debug.WriteLine($"[SettingsService] Échec de sauvegarde : {ex}");
+            return; // Persistance impossible : on n'avertit pas les abonnés.
+        }
+
         Changed?.Invoke();
     }
 }

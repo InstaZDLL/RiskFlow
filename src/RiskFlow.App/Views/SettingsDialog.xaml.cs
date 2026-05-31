@@ -13,7 +13,18 @@ namespace RiskFlow.Views
         {
             ViewModel = viewModel;
             InitializeComponent();
-            Loaded += async (_, _) => await ViewModel.LoadCategoriesAsync();
+            Loaded += async (_, _) =>
+            {
+                try
+                {
+                    await ViewModel.LoadCategoriesAsync();
+                }
+                catch (System.Exception ex)
+                {
+                    // Échec de chargement des catégories : le panneau s'ouvre sans liste plutôt que de crasher.
+                    System.Diagnostics.Debug.WriteLine($"[SettingsDialog] Chargement des catégories échoué : {ex}");
+                }
+            };
         }
 
         private void OnCategoryRenamed(object sender, RoutedEventArgs e)

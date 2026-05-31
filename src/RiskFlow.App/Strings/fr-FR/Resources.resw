@@ -109,6 +109,7 @@
   <data name="Confirm_DeleteBody" xml:space="preserve"><value>Supprimer « {0} » et tous ses risques ? Cette action est irréversible.</value></data>
   <data name="Msg_LastAnalysis" xml:space="preserve"><value>Impossible de supprimer la dernière analyse.</value></data>
   <data name="Msg_ImportError" xml:space="preserve"><value>Import impossible : {0}</value></data>
+  <data name="Msg_ExportError" xml:space="preserve"><value>Export impossible : {0}</value></data>
   <data name="Picker_Pdf" xml:space="preserve"><value>Document PDF</value></data>
   <data name="Picker_Excel" xml:space="preserve"><value>Classeur Excel</value></data>
   <data name="Picker_Json" xml:space="preserve"><value>Analyse RiskFlow (JSON)</value></data>

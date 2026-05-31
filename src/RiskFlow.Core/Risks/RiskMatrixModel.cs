@@ -17,6 +17,11 @@ public sealed class RiskMatrixModel
         IReadOnlyList<string> likelihoodLevels,
         RiskLevel[,] grid)
     {
+        if (grid.GetLength(0) != severityLevels.Count || grid.GetLength(1) != likelihoodLevels.Count)
+            throw new ArgumentException(
+                $"La grille ({grid.GetLength(0)}×{grid.GetLength(1)}) ne correspond pas aux axes " +
+                $"gravité×probabilité ({severityLevels.Count}×{likelihoodLevels.Count}).", nameof(grid));
+
         Key = key;
         Name = name;
         SeverityLevels = severityLevels;
@@ -36,7 +41,10 @@ public sealed class RiskMatrixModel
     /// <summary>Libellés de probabilité, du moins au plus probable (index 0..m-1).</summary>
     public IReadOnlyList<string> LikelihoodLevels { get; }
 
+    /// <summary>Nombre de niveaux de gravité (colonnes de la grille).</summary>
     public int SeverityCount => SeverityLevels.Count;
+
+    /// <summary>Nombre de niveaux de probabilité (lignes de la grille).</summary>
     public int LikelihoodCount => LikelihoodLevels.Count;
 
     /// <summary>Dimensions affichées, ex. « 3×4 » (probabilités × gravités).</summary>

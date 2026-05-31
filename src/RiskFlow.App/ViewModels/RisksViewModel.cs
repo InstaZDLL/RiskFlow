@@ -93,17 +93,23 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
     [ObservableProperty]
     public partial string ToastMessage { get; set; } = string.Empty;
 
-    /// <summary>Affiche un toast pendant quelques secondes.</summary>
+    private int _toastGeneration;
+
+    /// <summary>Affiche un toast pendant quelques secondes (un toast plus récent garde la main).</summary>
     public async Task ShowToastAsync(string message, int seconds = 2)
     {
+        var generation = ++_toastGeneration;
         ToastMessage = message;
         SavedMessageVisible = true;
         await Task.Delay(TimeSpan.FromSeconds(seconds));
-        SavedMessageVisible = false;
+
+        // N'efface que si aucun toast plus récent n'a pris le relais entre-temps.
+        if (generation == _toastGeneration)
+            SavedMessageVisible = false;
     }
 
     /// <summary>Fixe l'analyse affichée, recharge ses risques et les catégories.</summary>
-    public async Task SetAnalysisAsync(Analysis? analysis)
+    public async Task SetAnalysisAsync(Analysis? analysis, CancellationToken ct = default)
     {
         _analysis = analysis;
         _model = analysis?.Model ?? RiskMatrixModels.Default;
@@ -113,27 +119,27 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
         SeverityLevels = _model.SeverityLevels.Select(LanguageManager.Get).ToList();
         LikelihoodLevels = _model.LikelihoodLevels.Select(LanguageManager.Get).ToList();
 
-        await LoadCategoriesAsync();
-        await LoadAsync();
+        await LoadCategoriesAsync(ct);
+        await LoadAsync(ct);
     }
 
     /// <summary>Recharge les catégories (après modification dans les réglages).</summary>
     public Task ReloadCategoriesAsync() => LoadCategoriesAsync();
 
-    private async Task LoadCategoriesAsync()
+    private async Task LoadCategoriesAsync(CancellationToken ct = default)
     {
-        await using var db = await dbFactory.CreateDbContextAsync();
+        await using var db = await dbFactory.CreateDbContextAsync(ct);
         var names = await db.RiskCategories
             .OrderBy(c => c.SortOrder)
             .Select(c => c.Name)
-            .ToListAsync();
+            .ToListAsync(ct);
 
         Categories.Clear();
         foreach (var name in names)
             Categories.Add(name);
     }
 
-    private async Task LoadAsync()
+    private async Task LoadAsync(CancellationToken ct = default)
     {
         foreach (var row in Rows)
             row.PropertyChanged -= OnRowChanged;
@@ -146,12 +152,12 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
             return;
         }
 
-        await using var db = await dbFactory.CreateDbContextAsync();
+        await using var db = await dbFactory.CreateDbContextAsync(ct);
         var items = await db.Risks
             .Where(r => r.AnalysisId == _analysis.Id)
             .OrderBy(r => r.SortOrder)
             .ThenBy(r => r.RiskNumber)
-            .ToListAsync();
+            .ToListAsync(ct);
 
         foreach (var risk in items)
         {

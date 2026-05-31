@@ -35,7 +35,8 @@ public static class RiskReportExcel
         var avant = ws.Range(groupRow, 5, groupRow, 7).Merge();
         avant.Value = LanguageManager.Get("Col_GroupBefore");
         avant.Style.Fill.BackgroundColor = XLColor.FromArgb(253, 230, 138);
-        var apres = ws.Range(groupRow, 8, groupRow, 11).Merge();
+        // La colonne 8 (Stratégie) reste hors des groupes Avant/Après : elle les sépare.
+        var apres = ws.Range(groupRow, 9, groupRow, 11).Merge();
         apres.Value = LanguageManager.Get("Col_GroupAfter");
         apres.Style.Fill.BackgroundColor = XLColor.FromArgb(187, 247, 208);
         ws.Range(groupRow, 1, groupRow, 12).Style.Font.Bold = true;
@@ -88,11 +89,12 @@ public static class RiskReportExcel
         table.Style.Border.InsideBorderColor = XLColor.FromArgb(221, 221, 221);
         table.Style.Alignment.Vertical = XLAlignmentVerticalValues.Top;
 
+        // La plage 5..11 d'abord, puis les largeurs spécifiques, pour ne pas les écraser.
+        ws.Columns(5, 11).Width = 14;
         ws.Column(2).Width = 28;
         ws.Column(3).Width = 16;
         ws.Column(4).Width = 42;
         ws.Column(8).Width = 42;
-        ws.Columns(5, 11).Width = 14;
         ws.Column(4).Style.Alignment.WrapText = true;
         ws.Column(8).Style.Alignment.WrapText = true;
         ws.Column(2).Style.Alignment.WrapText = true;

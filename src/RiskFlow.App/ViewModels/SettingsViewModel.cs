@@ -95,8 +95,9 @@ public partial class SettingsViewModel : ObservableObject
             return;
 
         await using var db = await _dbFactory.CreateDbContextAsync();
-        if (await db.RiskCategories.AnyAsync(c => c.Name == name))
-            return; // doublon : ignoré
+        var lowered = name.ToLowerInvariant();
+        if (await db.RiskCategories.AnyAsync(c => c.Name.ToLower() == lowered))
+            return; // doublon (insensible à la casse) : ignoré
 
         var order = await db.RiskCategories.AnyAsync()
             ? await db.RiskCategories.MaxAsync(c => c.SortOrder) + 1
@@ -129,14 +130,25 @@ public partial class SettingsViewModel : ObservableObject
         if (entity is null)
             return;
 
-        if (await db.RiskCategories.AnyAsync(c => c.Name == name && c.Id != row.Id))
+        var lowered = name.ToLowerInvariant();
+        if (await db.RiskCategories.AnyAsync(c => c.Name.ToLower() == lowered && c.Id != row.Id))
         {
-            await LoadCategoriesAsync(); // doublon : revert
+            await LoadCategoriesAsync(); // doublon (insensible à la casse) : revert
             return;
         }
 
-        entity.Name = name;
-        await db.SaveChangesAsync();
+        var oldName = entity.Name;
+        if (oldName != name)
+        {
+            // Renommage + propagation aux risques dans une seule transaction (tout ou rien).
+            await using var tx = await db.Database.BeginTransactionAsync();
+            entity.Name = name;
+            await db.SaveChangesAsync();
+            await db.Risks.Where(r => r.Category == oldName)
+                .ExecuteUpdateAsync(s => s.SetProperty(r => r.Category, name));
+            await tx.CommitAsync();
+        }
+
         await _risks.ReloadCategoriesAsync();
     }
 
@@ -150,8 +162,15 @@ public partial class SettingsViewModel : ObservableObject
         var entity = await db.RiskCategories.FindAsync(row.Id);
         if (entity is not null)
         {
+            // Réaffecte les risques à une catégorie de repli puis supprime, en une transaction.
+            var fallback = Categories.FirstOrDefault(c => c.Id != row.Id)?.Name ?? RiskCategory.Defaults[0];
+
+            await using var tx = await db.Database.BeginTransactionAsync();
+            await db.Risks.Where(r => r.Category == entity.Name)
+                .ExecuteUpdateAsync(s => s.SetProperty(r => r.Category, fallback));
             db.RiskCategories.Remove(entity);
             await db.SaveChangesAsync();
+            await tx.CommitAsync();
         }
 
         Categories.Remove(row);

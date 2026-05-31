@@ -60,8 +60,9 @@ public static class RiskMatrixModels
 
     /// <summary>
     /// Construit une grille multiplicative : score = (gravité+1)·(probabilité+1) rapporté
-    /// au score maximal, découpé en quatre paliers (≈0.20 / 0.45 / 0.70). Reproduit la
-    /// grille 4×4 de référence.
+    /// au score maximal, découpé en quatre paliers (≈0.20 / 0.45 / 0.70). Les mêmes seuils
+    /// s'appliquent aux modèles 4×4 et 5×5 (seul <paramref name="severityCount"/> /
+    /// <paramref name="likelihoodCount"/> change). Reproduit la grille 4×4 de référence.
     /// </summary>
     private static RiskLevel[,] BuildMultiplicativeGrid(int severityCount, int likelihoodCount)
     {

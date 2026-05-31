@@ -104,6 +104,7 @@
   "Confirm_DeleteBody": "Supprimer « {0} » et tous ses risques ? Cette action est irréversible.",
   "Msg_LastAnalysis": "Impossible de supprimer la dernière analyse.",
   "Msg_ImportError": "Import impossible : {0}",
+  "Msg_ExportError": "Export impossible : {0}",
 
   "Picker_Pdf": "Document PDF",
   "Picker_Excel": "Classeur Excel",

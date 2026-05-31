@@ -109,6 +109,7 @@
   <data name="Confirm_DeleteBody" xml:space="preserve"><value>Delete “{0}” and all its risks? This action cannot be undone.</value></data>
   <data name="Msg_LastAnalysis" xml:space="preserve"><value>Cannot delete the last analysis.</value></data>
   <data name="Msg_ImportError" xml:space="preserve"><value>Import failed: {0}</value></data>
+  <data name="Msg_ExportError" xml:space="preserve"><value>Export failed: {0}</value></data>
   <data name="Picker_Pdf" xml:space="preserve"><value>PDF document</value></data>
   <data name="Picker_Excel" xml:space="preserve"><value>Excel workbook</value></data>
   <data name="Picker_Json" xml:space="preserve"><value>RiskFlow analysis (JSON)</value></data>

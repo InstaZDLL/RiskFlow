@@ -18,8 +18,13 @@ public static class DbInitializer
         var legacy = await context.RiskCategories.FirstOrDefaultAsync(c => c.Name == "Conformité/LPD", ct);
         if (legacy is not null && !await context.RiskCategories.AnyAsync(c => c.Name == "Conformité", ct))
         {
+            // Renommage + propagation aux risques (champ dénormalisé) en une transaction.
+            await using var tx = await context.Database.BeginTransactionAsync(ct);
             legacy.Name = "Conformité";
             await context.SaveChangesAsync(ct);
+            await context.Risks.Where(r => r.Category == "Conformité/LPD")
+                .ExecuteUpdateAsync(s => s.SetProperty(r => r.Category, "Conformité"), ct);
+            await tx.CommitAsync(ct);
         }
 
         if (!await context.RiskCategories.AnyAsync(ct))

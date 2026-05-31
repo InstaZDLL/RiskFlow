@@ -75,7 +75,20 @@ public static class AnalysisJson
         return JsonSerializer.Serialize(dto, Options);
     }
 
+    /// <summary>Préfixe de format accepté en lecture (compatibilité ascendante « riskflow/N »).</summary>
+    private const string FormatPrefix = "riskflow/";
+
     public static AnalysisExportDto Deserialize(string json)
-        => JsonSerializer.Deserialize<AnalysisExportDto>(json, Options)
-           ?? throw new FormatException("Fichier JSON invalide.");
+    {
+        var dto = JsonSerializer.Deserialize<AnalysisExportDto>(json, Options)
+                  ?? throw new FormatException("Fichier JSON invalide.");
+
+        if (string.IsNullOrWhiteSpace(dto.FormatVersion) ||
+            !dto.FormatVersion.StartsWith(FormatPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new FormatException($"Format de fichier non reconnu : « {dto.FormatVersion} ».");
+        }
+
+        return dto;
+    }
 }
