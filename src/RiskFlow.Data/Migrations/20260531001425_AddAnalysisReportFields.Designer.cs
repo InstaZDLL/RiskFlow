@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RiskFlow.Data;
 
@@ -10,9 +11,11 @@ using RiskFlow.Data;
 namespace RiskFlow.Data.Migrations
 {
     [DbContext(typeof(RiskFlowDbContext))]
-    partial class RiskFlowDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260531001425_AddAnalysisReportFields")]
+    partial class AddAnalysisReportFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.8");

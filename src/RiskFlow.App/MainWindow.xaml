@@ -37,7 +37,7 @@
         <NavigationView.MenuItemTemplate>
             <DataTemplate x:DataType="risks:Analysis">
                 <StackPanel Spacing="0">
-                    <TextBlock Text="{x:Bind Name}" />
+                    <TextBlock Text="{x:Bind Name, Mode=OneWay}" />
                     <TextBlock Text="{x:Bind Model.Dimensions}"
                                Style="{StaticResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />

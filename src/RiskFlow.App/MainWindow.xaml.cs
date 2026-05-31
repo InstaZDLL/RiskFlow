@@ -25,6 +25,8 @@ namespace RiskFlow
 
             InitializeComponent();
             ContentHost.Children.Add(mainPage);
+            mainPage.EditAnalysisRequested += OnEditAnalysisRequested;
+            mainPage.ExportPdfRequested += OnExportPdfRequested;
 
             SetWindowIcon();
             ApplyTheme();
@@ -59,9 +61,63 @@ namespace RiskFlow
             var dialog = new NewAnalysisDialog { XamlRoot = Content.XamlRoot };
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)
             {
-                await ViewModel.CreateAnalysisAsync(dialog.AnalysisName, dialog.SelectedModelKey);
+                await ViewModel.CreateAnalysisAsync(dialog.AnalysisName, dialog.SelectedModelKey,
+                    dialog.Author, dialog.Organization, dialog.ProjectDescription);
                 Nav.SelectedItem = ViewModel.SelectedAnalysis;
             }
+        }
+
+        private async void OnEditAnalysisRequested(object? sender, System.EventArgs e)
+        {
+            var analysis = ViewModel.SelectedAnalysis;
+            if (analysis is null)
+                return;
+
+            var dialog = new NewAnalysisDialog { XamlRoot = Content.XamlRoot };
+            dialog.ConfigureForEdit(analysis);
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            {
+                await ViewModel.UpdateAnalysisAsync(analysis, dialog.AnalysisName,
+                    dialog.Author, dialog.Organization, dialog.ProjectDescription);
+            }
+        }
+
+        private async void OnExportPdfRequested(object? sender, System.EventArgs e)
+        {
+            var analysis = ViewModel.SelectedAnalysis;
+            if (analysis is null)
+                return;
+
+            var hwnd = WindowNative.GetWindowHandle(this);
+            var picker = new Windows.Storage.Pickers.FileSavePicker
+            {
+                SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary,
+                SuggestedFileName = SafeFileName(analysis.Name),
+            };
+            picker.FileTypeChoices.Add("Document PDF", new System.Collections.Generic.List<string> { ".pdf" });
+            InitializeWithWindow.Initialize(picker, hwnd);
+
+            var file = await picker.PickSaveFileAsync();
+            if (file is null)
+                return;
+
+            var risks = ViewModel.Risks.SnapshotForExport();
+            var model = ViewModel.Risks.CurrentModel;
+            var author = FirstNonEmpty(analysis.Author, _settings.Current.ReportAuthor);
+            var organization = FirstNonEmpty(analysis.Organization, _settings.Current.ReportOrganization);
+
+            var bytes = RiskReportPdf.Generate(analysis, risks, model, author, organization, System.DateTimeOffset.Now);
+            await Windows.Storage.FileIO.WriteBytesAsync(file, bytes);
+            await Windows.System.Launcher.LaunchFileAsync(file);
+        }
+
+        private static string FirstNonEmpty(string? a, string? b)
+            => !string.IsNullOrWhiteSpace(a) ? a! : (b ?? string.Empty);
+
+        private static string SafeFileName(string name)
+        {
+            var safe = string.Concat(name.Split(System.IO.Path.GetInvalidFileNameChars()));
+            return string.IsNullOrWhiteSpace(safe) ? "analyse-risques" : safe;
         }
 
         private void ApplyTheme()

@@ -55,6 +55,17 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
     /// <summary>Modèle de matrice de l'analyse courante (axes + grille de niveaux).</summary>
     public RiskMatrixModel CurrentModel => _model;
 
+    /// <summary>
+    /// Synchronise les éventuelles éditions en cours dans les entités et renvoie les
+    /// risques de l'analyse, dans l'ordre d'affichage, pour l'export PDF.
+    /// </summary>
+    public IReadOnlyList<Risk> SnapshotForExport()
+    {
+        foreach (var row in Rows)
+            row.ApplyToModel();
+        return Rows.Select(r => r.Model).ToList();
+    }
+
     /// <summary>Affiche brièvement la confirmation « Sauvegardé ».</summary>
     [ObservableProperty]
     public partial bool SavedMessageVisible { get; set; }

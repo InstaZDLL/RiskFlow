@@ -22,6 +22,7 @@ namespace RiskFlow
         public App()
         {
             InitializeComponent();
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
             Services = ConfigureServices();
         }
 

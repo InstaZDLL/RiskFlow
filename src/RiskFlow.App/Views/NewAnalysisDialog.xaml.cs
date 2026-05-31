@@ -1,9 +1,14 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RiskFlow.Core.Risks;
 
 namespace RiskFlow.Views
 {
-    /// <summary>Dialog de création d'une analyse : nom + choix du modèle de matrice.</summary>
+    /// <summary>
+    /// Dialog de création ou d'édition d'une analyse : nom, modèle de matrice et
+    /// informations de rapport (auteur, organisation, description). En édition, le
+    /// modèle est verrouillé (le changer invaliderait les index des risques).
+    /// </summary>
     public sealed partial class NewAnalysisDialog : ContentDialog
     {
         public NewAnalysisDialog()
@@ -13,11 +18,27 @@ namespace RiskFlow.Views
             ModelChoice.SelectedItem = RiskMatrixModels.Default;
         }
 
-        /// <summary>Nom saisi (vide accepté : un nom par défaut sera généré).</summary>
         public string AnalysisName => NameBox.Text;
-
-        /// <summary>Clé du modèle sélectionné.</summary>
         public string SelectedModelKey =>
             (ModelChoice.SelectedItem as RiskMatrixModel ?? RiskMatrixModels.Default).Key;
+        public string Author => AuthorBox.Text;
+        public string Organization => OrgBox.Text;
+        public string ProjectDescription => DescBox.Text;
+
+        /// <summary>Configure le dialog pour modifier une analyse existante.</summary>
+        public void ConfigureForEdit(Analysis analysis)
+        {
+            Title = "Modifier l'analyse";
+            PrimaryButtonText = "Enregistrer";
+
+            NameBox.Text = analysis.Name;
+            AuthorBox.Text = analysis.Author ?? string.Empty;
+            OrgBox.Text = analysis.Organization ?? string.Empty;
+            DescBox.Text = analysis.ProjectDescription ?? string.Empty;
+
+            ModelChoice.SelectedItem = analysis.Model;
+            ModelChoice.IsEnabled = false;
+            ModelLockHint.Visibility = Visibility.Visible;
+        }
     }
 }

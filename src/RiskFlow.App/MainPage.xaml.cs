@@ -16,6 +16,12 @@ namespace RiskFlow
         private readonly SettingsService _settings;
         private bool _useAfter;
 
+        /// <summary>Demande d'édition de l'analyse courante (gérée par la fenêtre).</summary>
+        public event System.EventHandler? EditAnalysisRequested;
+
+        /// <summary>Demande d'export PDF de l'analyse courante (gérée par la fenêtre).</summary>
+        public event System.EventHandler? ExportPdfRequested;
+
         public RisksViewModel ViewModel { get; }
 
         public MainPage(RisksViewModel viewModel, SettingsService settings)
@@ -84,6 +90,12 @@ namespace RiskFlow
             _useAfter = EvalToggle.IsOn;
             BuildMatrix();
         }
+
+        private void OnEditAnalysisClick(object sender, RoutedEventArgs e)
+            => EditAnalysisRequested?.Invoke(this, System.EventArgs.Empty);
+
+        private void OnExportPdfClick(object sender, RoutedEventArgs e)
+            => ExportPdfRequested?.Invoke(this, System.EventArgs.Empty);
 
         /// <summary>Construit la grille colorée gravité × probabilité.</summary>
         private void BuildMatrix()

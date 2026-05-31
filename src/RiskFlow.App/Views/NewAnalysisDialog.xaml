@@ -12,22 +12,34 @@
     CloseButtonText="Annuler"
     DefaultButton="Primary">
 
-    <StackPanel Spacing="20" MinWidth="380">
-        <TextBox x:Name="NameBox"
-                 Header="Nom de l'analyse"
-                 PlaceholderText="Ex. AD Account Manager" />
+    <ScrollViewer MaxHeight="520" HorizontalScrollMode="Disabled">
+        <StackPanel Spacing="16" MinWidth="380">
+            <TextBox x:Name="NameBox"
+                     Header="Nom de l'analyse"
+                     PlaceholderText="Ex. AD Account Manager" />
 
-        <RadioButtons x:Name="ModelChoice" Header="Modèle de matrice">
-            <RadioButtons.ItemTemplate>
-                <DataTemplate x:DataType="risks:RiskMatrixModel">
-                    <StackPanel Spacing="0">
-                        <TextBlock Text="{x:Bind Name}" />
-                        <TextBlock Text="{x:Bind Dimensions}"
-                                   Style="{StaticResource CaptionTextBlockStyle}"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    </StackPanel>
-                </DataTemplate>
-            </RadioButtons.ItemTemplate>
-        </RadioButtons>
-    </StackPanel>
+            <RadioButtons x:Name="ModelChoice" Header="Modèle de matrice">
+                <RadioButtons.ItemTemplate>
+                    <DataTemplate x:DataType="risks:RiskMatrixModel">
+                        <StackPanel Spacing="0">
+                            <TextBlock Text="{x:Bind Name}" />
+                            <TextBlock Text="{x:Bind Dimensions}"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </RadioButtons.ItemTemplate>
+            </RadioButtons>
+
+            <TextBlock x:Name="ModelLockHint" Visibility="Collapsed"
+                       Text="Le modèle de matrice ne peut pas être changé après création."
+                       Style="{StaticResource CaptionTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+            <TextBox x:Name="AuthorBox" Header="Auteur (facultatif)" />
+            <TextBox x:Name="OrgBox" Header="Organisation (facultatif)" />
+            <TextBox x:Name="DescBox" Header="Description du projet (facultatif)"
+                     TextWrapping="Wrap" AcceptsReturn="True" Height="72" />
+        </StackPanel>
+    </ScrollViewer>
 </ContentDialog>

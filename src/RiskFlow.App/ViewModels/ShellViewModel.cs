@@ -47,7 +47,8 @@ public partial class ShellViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
     }
 
     /// <summary>Crée une analyse, l'ajoute à la liste et la sélectionne.</summary>
-    public async Task<Analysis> CreateAnalysisAsync(string name, string modelKey)
+    public async Task<Analysis> CreateAnalysisAsync(string name, string modelKey,
+        string? author = null, string? organization = null, string? projectDescription = null)
     {
         var nextOrder = Analyses.Count == 0 ? 0 : Analyses.Max(a => a.SortOrder) + 1;
 
@@ -55,6 +56,9 @@ public partial class ShellViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
         {
             Name = string.IsNullOrWhiteSpace(name) ? $"Analyse {Analyses.Count + 1}" : name.Trim(),
             ModelKey = RiskMatrixModels.Get(modelKey).Key,
+            Author = Normalize(author),
+            Organization = Normalize(organization),
+            ProjectDescription = Normalize(projectDescription),
             SortOrder = nextOrder,
         };
 
@@ -66,6 +70,34 @@ public partial class ShellViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
         SelectedAnalysis = analysis;
         return analysis;
     }
+
+    /// <summary>Met à jour le nom et les informations de rapport d'une analyse existante.</summary>
+    public async Task UpdateAnalysisAsync(Analysis analysis, string name,
+        string? author, string? organization, string? projectDescription)
+    {
+        await using var db = await dbFactory.CreateDbContextAsync();
+        var entity = await db.Analyses.FindAsync(analysis.Id);
+        if (entity is null)
+            return;
+
+        entity.Name = string.IsNullOrWhiteSpace(name) ? entity.Name : name.Trim();
+        entity.Author = Normalize(author);
+        entity.Organization = Normalize(organization);
+        entity.ProjectDescription = Normalize(projectDescription);
+        await db.SaveChangesAsync();
+
+        // Répercute sur l'instance en mémoire (Name notifie la barre latérale).
+        analysis.Name = entity.Name;
+        analysis.Author = entity.Author;
+        analysis.Organization = entity.Organization;
+        analysis.ProjectDescription = entity.ProjectDescription;
+
+        if (ReferenceEquals(SelectedAnalysis, analysis))
+            risks.AnalysisName = analysis.Name;
+    }
+
+    private static string? Normalize(string? value)
+        => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
     [RelayCommand(CanExecute = nameof(CanDeleteAnalysis))]
     private async Task DeleteAnalysisAsync(Analysis? analysis)
