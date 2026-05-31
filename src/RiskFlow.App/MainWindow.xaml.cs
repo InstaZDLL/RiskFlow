@@ -27,6 +27,7 @@ namespace RiskFlow
             ContentHost.Children.Add(mainPage);
             mainPage.EditAnalysisRequested += OnEditAnalysisRequested;
             mainPage.ExportPdfRequested += OnExportPdfRequested;
+            mainPage.ExportExcelRequested += OnExportExcelRequested;
 
             SetWindowIcon();
             ApplyTheme();
@@ -130,6 +131,14 @@ namespace RiskFlow
             }.ShowAsync().AsTask();
 
         private async void OnExportPdfRequested(object? sender, System.EventArgs e)
+            => await ExportAsync("Document PDF", ".pdf", RiskReportPdf.Generate);
+
+        private async void OnExportExcelRequested(object? sender, System.EventArgs e)
+            => await ExportAsync("Classeur Excel", ".xlsx", RiskReportExcel.Generate);
+
+        private async System.Threading.Tasks.Task ExportAsync(string label, string extension,
+            System.Func<Analysis, System.Collections.Generic.IReadOnlyList<Core.Risks.Risk>,
+                Core.Risks.RiskMatrixModel, string, string, System.DateTimeOffset, byte[]> generate)
         {
             var analysis = ViewModel.SelectedAnalysis;
             if (analysis is null)
@@ -141,7 +150,7 @@ namespace RiskFlow
                 SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary,
                 SuggestedFileName = SafeFileName(analysis.Name),
             };
-            picker.FileTypeChoices.Add("Document PDF", new System.Collections.Generic.List<string> { ".pdf" });
+            picker.FileTypeChoices.Add(label, new System.Collections.Generic.List<string> { extension });
             InitializeWithWindow.Initialize(picker, hwnd);
 
             var file = await picker.PickSaveFileAsync();
@@ -153,7 +162,7 @@ namespace RiskFlow
             var author = FirstNonEmpty(analysis.Author, _settings.Current.ReportAuthor);
             var organization = FirstNonEmpty(analysis.Organization, _settings.Current.ReportOrganization);
 
-            var bytes = RiskReportPdf.Generate(analysis, risks, model, author, organization, System.DateTimeOffset.Now);
+            var bytes = generate(analysis, risks, model, author, organization, System.DateTimeOffset.Now);
             await Windows.Storage.FileIO.WriteBytesAsync(file, bytes);
             await Windows.System.Launcher.LaunchFileAsync(file);
         }

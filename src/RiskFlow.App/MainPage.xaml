@@ -132,6 +132,12 @@
                             <TextBlock Text="Exporter PDF" />
                         </StackPanel>
                     </Button>
+                    <Button Click="OnExportExcelClick">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE9F9;" FontSize="14" />
+                            <TextBlock Text="Exporter Excel" />
+                        </StackPanel>
+                    </Button>
                     <ToggleButton IsChecked="{x:Bind ViewModel.ShowDescriptions, Mode=TwoWay}"
                                   ToolTipService.ToolTip="Afficher les colonnes Description et Stratégie">
                         <StackPanel Orientation="Horizontal" Spacing="6">

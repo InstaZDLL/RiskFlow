@@ -22,6 +22,9 @@ namespace RiskFlow
         /// <summary>Demande d'export PDF de l'analyse courante (gérée par la fenêtre).</summary>
         public event System.EventHandler? ExportPdfRequested;
 
+        /// <summary>Demande d'export Excel de l'analyse courante (gérée par la fenêtre).</summary>
+        public event System.EventHandler? ExportExcelRequested;
+
         public RisksViewModel ViewModel { get; }
 
         public MainPage(RisksViewModel viewModel, SettingsService settings)
@@ -97,6 +100,9 @@ namespace RiskFlow
 
         private void OnExportPdfClick(object sender, RoutedEventArgs e)
             => ExportPdfRequested?.Invoke(this, System.EventArgs.Empty);
+
+        private void OnExportExcelClick(object sender, RoutedEventArgs e)
+            => ExportExcelRequested?.Invoke(this, System.EventArgs.Empty);
 
         /// <summary>Construit la grille colorée gravité × probabilité.</summary>
         private void BuildMatrix()
