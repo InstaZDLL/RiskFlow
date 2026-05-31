@@ -11,25 +11,26 @@ public static class RiskMatrixModels
     /// Modèle 3×4 historique de TPI-Flow : grille explicite (non multiplicative),
     /// port fidèle de l'ancienne table de <c>risk-logic.ts</c>.
     /// </summary>
+    // Les libellés sont des CLÉS de ressources (traduites à l'affichage par la couche App).
     private static readonly RiskMatrixModel Model3x4 = new(
         Key3x4,
-        "Standard 3×4",
-        severityLevels: ["Acceptable", "Tolérable", "Indésirable", "Intolérable"],
-        likelihoodLevels: ["Improbable", "Possible", "Probable"],
+        "Model_3x4",
+        severityLevels: ["Sev_Acceptable", "Sev_Tolerable", "Sev_Undesirable", "Sev_Intolerable"],
+        likelihoodLevels: ["Lik_Improbable", "Lik_Possible", "Lik_Probable"],
         grid: BuildGrid3x4());
 
     private static readonly RiskMatrixModel Model4x4 = new(
         Key4x4,
-        "Étendu 4×4",
-        severityLevels: ["Acceptable", "Tolérable", "Indésirable", "Intolérable"],
-        likelihoodLevels: ["Improbable", "Possible", "Probable", "Très probable"],
+        "Model_4x4",
+        severityLevels: ["Sev_Acceptable", "Sev_Tolerable", "Sev_Undesirable", "Sev_Intolerable"],
+        likelihoodLevels: ["Lik_Improbable", "Lik_Possible", "Lik_Probable", "Lik_VeryProbable"],
         grid: BuildMultiplicativeGrid(severityCount: 4, likelihoodCount: 4));
 
     private static readonly RiskMatrixModel Model5x5 = new(
         Key5x5,
-        "Détaillé 5×5",
-        severityLevels: ["Négligeable", "Mineur", "Modéré", "Majeur", "Critique"],
-        likelihoodLevels: ["Très rare", "Rare", "Possible", "Probable", "Très probable"],
+        "Model_5x5",
+        severityLevels: ["Sev_Negligible", "Sev_Minor", "Sev_Moderate", "Sev_Major", "Sev_Critical"],
+        likelihoodLevels: ["Lik_VeryRare", "Lik_Rare", "Lik_Possible", "Lik_Probable", "Lik_VeryProbable"],
         grid: BuildMultiplicativeGrid(severityCount: 5, likelihoodCount: 5));
 
     public static IReadOnlyList<RiskMatrixModel> All { get; } = [Model3x4, Model4x4, Model5x5];

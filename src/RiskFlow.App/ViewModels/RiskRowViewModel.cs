@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using RiskFlow.Core.Risks;
+using RiskFlow.Services;
 
 namespace RiskFlow.ViewModels;
 
@@ -76,7 +77,7 @@ public partial class RiskRowViewModel : ObservableObject
     public string AfterLikelihoodLabel => Label(_matrix.LikelihoodLevels, AfterLikelihoodIndex);
 
     private static string Label(IReadOnlyList<string> levels, int index)
-        => index >= 0 && index < levels.Count ? levels[index] : string.Empty;
+        => index >= 0 && index < levels.Count ? LanguageManager.Get(levels[index]) : string.Empty;
 
     /// <summary>Met à jour l'ordre d'affichage et le numéro du risque (réorganisation).</summary>
     public void SetOrder(int sortOrder, int riskNumber)

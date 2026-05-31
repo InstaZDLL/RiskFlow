@@ -7,8 +7,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Title="Réglages"
-    CloseButtonText="Fermer"
+    Title="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Settings_Title}"
+    CloseButtonText="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Common_Close}"
     DefaultButton="Close">
 
     <ContentDialog.Resources>
@@ -33,40 +33,49 @@
             <StackPanel Grid.Column="0" Spacing="16">
                 <Border Style="{StaticResource SettingsCard}">
                     <StackPanel Spacing="10">
-                        <TextBlock Text="Apparence" Style="{StaticResource SubtitleTextBlockStyle}" />
-                        <RadioButtons Header="Thème" MaxColumns="3"
+                        <TextBlock Text="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Settings_Appearance}"
+                                   Style="{StaticResource SubtitleTextBlockStyle}" />
+                        <RadioButtons Header="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Settings_Theme}" MaxColumns="3"
                                       SelectedIndex="{x:Bind ViewModel.ThemeIndex, Mode=TwoWay}">
-                            <x:String>Système</x:String>
-                            <x:String>Clair</x:String>
-                            <x:String>Sombre</x:String>
+                            <RadioButton Tag="Common_System" Content="{Binding Tag, RelativeSource={RelativeSource Self}, Converter={StaticResource L}}" />
+                            <RadioButton Tag="Theme_Light" Content="{Binding Tag, RelativeSource={RelativeSource Self}, Converter={StaticResource L}}" />
+                            <RadioButton Tag="Theme_Dark" Content="{Binding Tag, RelativeSource={RelativeSource Self}, Converter={StaticResource L}}" />
+                        </RadioButtons>
+                        <RadioButtons Header="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Settings_Language}" MaxColumns="3"
+                                      SelectedIndex="{x:Bind ViewModel.LanguageIndex, Mode=TwoWay}">
+                            <RadioButton Tag="Common_System" Content="{Binding Tag, RelativeSource={RelativeSource Self}, Converter={StaticResource L}}" />
+                            <RadioButton Tag="Lang_French" Content="{Binding Tag, RelativeSource={RelativeSource Self}, Converter={StaticResource L}}" />
+                            <RadioButton Tag="Lang_English" Content="{Binding Tag, RelativeSource={RelativeSource Self}, Converter={StaticResource L}}" />
                         </RadioButtons>
                     </StackPanel>
                 </Border>
 
                 <Border Style="{StaticResource SettingsCard}">
                     <StackPanel Spacing="14">
-                        <TextBlock Text="Affichage de la matrice" Style="{StaticResource SubtitleTextBlockStyle}" />
-                        <RadioButtons Header="Emplacement"
+                        <TextBlock Text="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Settings_MatrixDisplay}"
+                                   Style="{StaticResource SubtitleTextBlockStyle}" />
+                        <RadioButtons Header="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Settings_Placement}"
                                       SelectedIndex="{x:Bind ViewModel.MatrixPlacementIndex, Mode=TwoWay}">
-                            <x:String>Onglets Registre / Matrice</x:String>
-                            <x:String>Sous le tableau</x:String>
+                            <RadioButton Tag="Placement_Tabs" Content="{Binding Tag, RelativeSource={RelativeSource Self}, Converter={StaticResource L}}" />
+                            <RadioButton Tag="Placement_Below" Content="{Binding Tag, RelativeSource={RelativeSource Self}, Converter={StaticResource L}}" />
                         </RadioButtons>
-                        <RadioButtons Header="Contenu des cellules"
+                        <RadioButtons Header="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Settings_CellContent}"
                                       SelectedIndex="{x:Bind ViewModel.MatrixCellContentIndex, Mode=TwoWay}">
-                            <x:String>Numéros des risques</x:String>
-                            <x:String>Compteur</x:String>
+                            <RadioButton Tag="Cell_Numbers" Content="{Binding Tag, RelativeSource={RelativeSource Self}, Converter={StaticResource L}}" />
+                            <RadioButton Tag="Cell_Count" Content="{Binding Tag, RelativeSource={RelativeSource Self}, Converter={StaticResource L}}" />
                         </RadioButtons>
-                        <RadioButtons Header="Évaluation par défaut"
+                        <RadioButtons Header="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Settings_DefaultEval}"
                                       SelectedIndex="{x:Bind ViewModel.MatrixEvalIndex, Mode=TwoWay}">
-                            <x:String>Avant mitigation</x:String>
-                            <x:String>Après mitigation</x:String>
+                            <RadioButton Tag="Matrix_Before" Content="{Binding Tag, RelativeSource={RelativeSource Self}, Converter={StaticResource L}}" />
+                            <RadioButton Tag="Matrix_After" Content="{Binding Tag, RelativeSource={RelativeSource Self}, Converter={StaticResource L}}" />
                         </RadioButtons>
                     </StackPanel>
                 </Border>
 
                 <Border Style="{StaticResource SettingsCard}">
                     <StackPanel Spacing="10">
-                        <TextBlock Text="À propos" Style="{StaticResource SubtitleTextBlockStyle}" />
+                        <TextBlock Text="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Settings_About}"
+                                   Style="{StaticResource SubtitleTextBlockStyle}" />
                         <StackPanel Orientation="Horizontal" Spacing="12">
                             <Image Width="48" Height="48" VerticalAlignment="Top"
                                    Source="ms-appx:///Assets/Square150x150Logo.scale-200.png" />
@@ -80,7 +89,7 @@
                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                             </StackPanel>
                         </StackPanel>
-                        <HyperlinkButton Content="Code source (GitHub)" Padding="0"
+                        <HyperlinkButton Content="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Settings_SourceCode}" Padding="0"
                                          NavigateUri="https://github.com/InstaZDLL/RiskFlow" />
                     </StackPanel>
                 </Border>
@@ -90,18 +99,22 @@
             <StackPanel Grid.Column="1" Spacing="16">
                 <Border Style="{StaticResource SettingsCard}">
                     <StackPanel Spacing="10">
-                        <TextBlock Text="Rapport (export PDF)" Style="{StaticResource SubtitleTextBlockStyle}" />
-                        <TextBlock Text="Valeurs par défaut, surchargeables par analyse."
+                        <TextBlock Text="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Settings_Report}"
+                                   Style="{StaticResource SubtitleTextBlockStyle}" />
+                        <TextBlock Text="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Settings_ReportHint}"
                                    Style="{StaticResource CaptionTextBlockStyle}"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBox Header="Auteur" Text="{x:Bind ViewModel.ReportAuthor, Mode=TwoWay}" />
-                        <TextBox Header="Organisation" Text="{x:Bind ViewModel.ReportOrganization, Mode=TwoWay}" />
+                        <TextBox Header="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Common_Author}"
+                                 Text="{x:Bind ViewModel.ReportAuthor, Mode=TwoWay}" />
+                        <TextBox Header="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Common_Organization}"
+                                 Text="{x:Bind ViewModel.ReportOrganization, Mode=TwoWay}" />
                     </StackPanel>
                 </Border>
 
                 <Border Style="{StaticResource SettingsCard}">
                     <StackPanel Spacing="10">
-                        <TextBlock Text="Catégories de risques" Style="{StaticResource SubtitleTextBlockStyle}" />
+                        <TextBlock Text="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Settings_Categories}"
+                                   Style="{StaticResource SubtitleTextBlockStyle}" />
 
                         <ItemsControl ItemsSource="{x:Bind ViewModel.Categories}">
                             <ItemsControl.ItemTemplate>
@@ -114,7 +127,7 @@
                                         <TextBox Grid.Column="0" Text="{x:Bind Name, Mode=TwoWay}"
                                                  LostFocus="OnCategoryRenamed" />
                                         <Button Grid.Column="1" Click="OnDeleteCategory"
-                                                ToolTipService.ToolTip="Supprimer">
+                                                ToolTipService.ToolTip="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Common_Delete}">
                                             <FontIcon Glyph="&#xE74D;" FontSize="14" />
                                         </Button>
                                     </Grid>
@@ -127,9 +140,9 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" PlaceholderText="Nouvelle catégorie…"
+                            <TextBox Grid.Column="0" PlaceholderText="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Settings_NewCategory}"
                                      Text="{x:Bind ViewModel.NewCategoryName, Mode=TwoWay}" />
-                            <Button Grid.Column="1" Content="Ajouter"
+                            <Button Grid.Column="1" Content="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Common_Add}"
                                     Style="{StaticResource AccentButtonStyle}"
                                     Command="{x:Bind ViewModel.AddCategoryCommand}" />
                         </Grid>

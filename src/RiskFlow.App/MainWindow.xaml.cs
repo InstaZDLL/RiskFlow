@@ -54,8 +54,12 @@ namespace RiskFlow
 
         private async System.Threading.Tasks.Task ShowSettingsAsync()
         {
+            var languageBefore = _settings.Current.Language;
             var dialog = new SettingsDialog(_settingsViewModel) { XamlRoot = Content.XamlRoot };
             await dialog.ShowAsync();
+
+            if (_settings.Current.Language != languageBefore)
+                await ViewModel.Risks.ShowToastAsync(LanguageManager.Get("Toast_RestartLanguage"), seconds: 4);
         }
 
         private async void OnNewAnalysisClick(object sender, RoutedEventArgs e)
@@ -98,16 +102,16 @@ namespace RiskFlow
 
             if (ViewModel.Analyses.Count <= 1)
             {
-                await ShowInfoAsync("Impossible de supprimer la dernière analyse.");
+                await ShowInfoAsync(RiskFlow.Services.LanguageManager.Get("Msg_LastAnalysis"));
                 return;
             }
 
             var confirm = new ContentDialog
             {
-                Title = "Supprimer l'analyse",
-                Content = $"Supprimer « {analysis.Name} » et tous ses risques ? Cette action est irréversible.",
-                PrimaryButtonText = "Supprimer",
-                CloseButtonText = "Annuler",
+                Title = RiskFlow.Services.LanguageManager.Get("Confirm_DeleteTitle"),
+                Content = string.Format(RiskFlow.Services.LanguageManager.Get("Confirm_DeleteBody"), analysis.Name),
+                PrimaryButtonText = RiskFlow.Services.LanguageManager.Get("Common_Delete"),
+                CloseButtonText = RiskFlow.Services.LanguageManager.Get("Common_Cancel"),
                 DefaultButton = ContentDialogButton.Close,
                 XamlRoot = Content.XamlRoot,
             };
@@ -127,15 +131,15 @@ namespace RiskFlow
             {
                 Title = "RiskFlow",
                 Content = message,
-                CloseButtonText = "OK",
+                CloseButtonText = RiskFlow.Services.LanguageManager.Get("Common_Ok"),
                 XamlRoot = Content.XamlRoot,
             }.ShowAsync().AsTask();
 
         private async void OnExportPdfRequested(object? sender, System.EventArgs e)
-            => await ExportAsync("Document PDF", ".pdf", RiskReportPdf.Generate);
+            => await ExportAsync(RiskFlow.Services.LanguageManager.Get("Picker_Pdf"), ".pdf", RiskReportPdf.Generate);
 
         private async void OnExportExcelRequested(object? sender, System.EventArgs e)
-            => await ExportAsync("Classeur Excel", ".xlsx", RiskReportExcel.Generate);
+            => await ExportAsync(RiskFlow.Services.LanguageManager.Get("Picker_Excel"), ".xlsx", RiskReportExcel.Generate);
 
         private async System.Threading.Tasks.Task ExportAsync(string label, string extension,
             System.Func<Analysis, System.Collections.Generic.IReadOnlyList<Core.Risks.Risk>,
@@ -179,7 +183,7 @@ namespace RiskFlow
                 SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary,
                 SuggestedFileName = SafeFileName(analysis.Name),
             };
-            picker.FileTypeChoices.Add("Analyse RiskFlow (JSON)", new System.Collections.Generic.List<string> { ".json" });
+            picker.FileTypeChoices.Add(RiskFlow.Services.LanguageManager.Get("Picker_Json"), new System.Collections.Generic.List<string> { ".json" });
             InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
 
             var file = await picker.PickSaveFileAsync();
@@ -212,7 +216,7 @@ namespace RiskFlow
             }
             catch (System.Exception ex)
             {
-                await ShowInfoAsync($"Import impossible : {ex.Message}");
+                await ShowInfoAsync(string.Format(RiskFlow.Services.LanguageManager.Get("Msg_ImportError"), ex.Message));
             }
         }
 

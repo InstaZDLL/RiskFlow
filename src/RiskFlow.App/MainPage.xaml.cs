@@ -130,12 +130,12 @@ namespace RiskFlow
                 MatrixHost.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
             for (var s = 0; s < nSev; s++)
-                AddToGrid(HeaderText(model.SeverityLevels[s], center: true), row: 0, column: s + 1);
+                AddToGrid(HeaderText(Services.LanguageManager.Get(model.SeverityLevels[s]), center: true), row: 0, column: s + 1);
 
             for (var rowIdx = 1; rowIdx <= nLik; rowIdx++)
             {
                 var likIndex = nLik - rowIdx;
-                AddToGrid(HeaderText(model.LikelihoodLevels[likIndex], center: false), row: rowIdx, column: 0);
+                AddToGrid(HeaderText(Services.LanguageManager.Get(model.LikelihoodLevels[likIndex]), center: false), row: rowIdx, column: 0);
 
                 for (var s = 0; s < nSev; s++)
                     AddToGrid(BuildCell(model.Level(s, likIndex), CellText(s, likIndex)), row: rowIdx, column: s + 1);

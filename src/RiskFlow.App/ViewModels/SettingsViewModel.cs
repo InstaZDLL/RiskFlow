@@ -18,7 +18,8 @@ public partial class SettingsViewModel : ObservableObject
     private readonly RisksViewModel _risks;
     private bool _loading;
 
-    public SettingsViewModel(SettingsService settings, IDbContextFactory<RiskFlowDbContext> dbFactory, RisksViewModel risks)
+    public SettingsViewModel(SettingsService settings, IDbContextFactory<RiskFlowDbContext> dbFactory,
+        RisksViewModel risks)
     {
         _settings = settings;
         _dbFactory = dbFactory;
@@ -27,6 +28,7 @@ public partial class SettingsViewModel : ObservableObject
         var s = settings.Current;
         _loading = true;
         ThemeIndex = (int)s.Theme;
+        LanguageIndex = (int)s.Language;
         MatrixPlacementIndex = (int)s.MatrixPlacement;
         MatrixCellContentIndex = (int)s.MatrixCellContent;
         MatrixEvalIndex = (int)s.MatrixDefaultEvaluation;
@@ -37,6 +39,7 @@ public partial class SettingsViewModel : ObservableObject
 
     // ----- Apparence & matrice (index liés à des RadioButtons) -----
     [ObservableProperty] public partial int ThemeIndex { get; set; }
+    [ObservableProperty] public partial int LanguageIndex { get; set; }
     [ObservableProperty] public partial int MatrixPlacementIndex { get; set; }
     [ObservableProperty] public partial int MatrixCellContentIndex { get; set; }
     [ObservableProperty] public partial int MatrixEvalIndex { get; set; }
@@ -55,6 +58,10 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] public partial string NewCategoryName { get; set; } = string.Empty;
 
     partial void OnThemeIndexChanged(int value) => Persist(s => s.Theme = (ThemeMode)value);
+
+    // La langue est appliquée au prochain démarrage (un toast invite à redémarrer).
+    partial void OnLanguageIndexChanged(int value) => Persist(s => s.Language = (AppLanguage)value);
+
     partial void OnMatrixPlacementIndexChanged(int value) => Persist(s => s.MatrixPlacement = (MatrixPlacement)value);
     partial void OnMatrixCellContentIndexChanged(int value) => Persist(s => s.MatrixCellContent = (MatrixCellContent)value);
     partial void OnMatrixEvalIndexChanged(int value) => Persist(s => s.MatrixDefaultEvaluation = (MatrixEvaluation)value);

@@ -23,7 +23,9 @@ namespace RiskFlow
         {
             InitializeComponent();
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
             Services = ConfigureServices();
+            LanguageManager.SetLanguage(Services.GetRequiredService<SettingsService>().Current.Language);
         }
 
         private static IServiceProvider ConfigureServices()
@@ -45,6 +47,11 @@ namespace RiskFlow
 
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
+            // Source stable + converter de localisation pour les bindings XAML
+            // ({StaticResource Loc} / {StaticResource L}).
+            Resources["Loc"] = new object();
+            Resources["L"] = new Converters.LocalizeConverter();
+
             await using (var db = await Services
                 .GetRequiredService<IDbContextFactory<RiskFlowDbContext>>()
                 .CreateDbContextAsync())

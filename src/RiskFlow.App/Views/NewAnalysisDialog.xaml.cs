@@ -28,8 +28,8 @@ namespace RiskFlow.Views
         /// <summary>Configure le dialog pour modifier une analyse existante.</summary>
         public void ConfigureForEdit(Analysis analysis)
         {
-            Title = "Modifier l'analyse";
-            PrimaryButtonText = "Enregistrer";
+            Title = RiskFlow.Services.LanguageManager.Get("Dialog_EditTitle");
+            PrimaryButtonText = RiskFlow.Services.LanguageManager.Get("Common_Save");
 
             NameBox.Text = analysis.Name;
             AuthorBox.Text = analysis.Author ?? string.Empty;

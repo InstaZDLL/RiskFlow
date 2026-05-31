@@ -17,11 +17,11 @@ public static class RiskReportExcel
         var ws = workbook.Worksheets.Add("Risques");
 
         // En-tête du document.
-        ws.Cell(1, 1).Value = "Analyse de risques";
+        ws.Cell(1, 1).Value = LanguageManager.Get("Report_Title");
         ws.Cell(1, 1).Style.Font.Bold = true;
         ws.Cell(1, 1).Style.Font.FontSize = 16;
 
-        var meta = string.Join("   —   ", new[] { analysis.Name, author, organization, $"Exporté le {date:dd/MM/yyyy}" }
+        var meta = string.Join("   —   ", new[] { analysis.Name, author, organization, $"{LanguageManager.Get("Report_ExportedOn")} {date:dd/MM/yyyy}" }
             .Where(p => !string.IsNullOrWhiteSpace(p)));
         ws.Cell(2, 1).Value = meta;
         ws.Cell(2, 1).Style.Font.FontColor = XLColor.FromArgb(90, 90, 90);
@@ -31,19 +31,26 @@ public static class RiskReportExcel
         var dataRow = headRow + 1;
 
         // Ligne de groupes (fusionnée).
-        ws.Range(groupRow, 1, groupRow, 4).Merge().Value = "IDENTIFICATION";
+        ws.Range(groupRow, 1, groupRow, 4).Merge().Value = LanguageManager.Get("Col_GroupId");
         var avant = ws.Range(groupRow, 5, groupRow, 7).Merge();
-        avant.Value = "AVANT ATTÉNUATION";
+        avant.Value = LanguageManager.Get("Col_GroupBefore");
         avant.Style.Fill.BackgroundColor = XLColor.FromArgb(253, 230, 138);
         var apres = ws.Range(groupRow, 8, groupRow, 11).Merge();
-        apres.Value = "APRÈS ATTÉNUATION";
+        apres.Value = LanguageManager.Get("Col_GroupAfter");
         apres.Style.Fill.BackgroundColor = XLColor.FromArgb(187, 247, 208);
         ws.Range(groupRow, 1, groupRow, 12).Style.Font.Bold = true;
         ws.Range(groupRow, 1, groupRow, 12).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
         // Ligne d'en-têtes de colonnes.
-        var headers = new[] { "#", "Titre", "Catégorie", "Description", "Gravité", "Probabilité", "Niveau",
-            "Stratégie", "Gravité", "Probabilité", "Niveau", "Continuer ?" };
+        var headers = new[]
+        {
+            LanguageManager.Get("Col_Num"), LanguageManager.Get("Col_Title"),
+            LanguageManager.Get("Col_Category"), LanguageManager.Get("Col_Description"),
+            LanguageManager.Get("Col_Severity"), LanguageManager.Get("Col_Likelihood"),
+            LanguageManager.Get("Col_Level"), LanguageManager.Get("Col_Strategy"),
+            LanguageManager.Get("Col_Severity"), LanguageManager.Get("Col_Likelihood"),
+            LanguageManager.Get("Col_Level"), LanguageManager.Get("Col_Continue"),
+        };
         for (var c = 0; c < headers.Length; c++)
         {
             var cell = ws.Cell(headRow, c + 1);
@@ -59,7 +66,7 @@ public static class RiskReportExcel
         {
             ws.Cell(r, 1).Value = n;
             ws.Cell(r, 2).Value = risk.Title;
-            ws.Cell(r, 3).Value = risk.Category;
+            ws.Cell(r, 3).Value = RiskText.Category(risk.Category);
             ws.Cell(r, 4).Value = risk.Description ?? string.Empty;
             ws.Cell(r, 5).Value = Label(model.SeverityLevels, risk.BeforeSeverityIndex);
             ws.Cell(r, 6).Value = Label(model.LikelihoodLevels, risk.BeforeLikelihoodIndex);
@@ -68,7 +75,7 @@ public static class RiskReportExcel
             ws.Cell(r, 9).Value = Label(model.SeverityLevels, risk.AfterSeverityIndex);
             ws.Cell(r, 10).Value = Label(model.LikelihoodLevels, risk.AfterLikelihoodIndex);
             LevelCell(ws.Cell(r, 11), model.Level(risk.AfterSeverityIndex, risk.AfterLikelihoodIndex));
-            ws.Cell(r, 12).Value = risk.CanContinue ? "Oui" : "Non";
+            ws.Cell(r, 12).Value = LanguageManager.Get(risk.CanContinue ? "Detail_Yes" : "Detail_No");
             r++;
             n++;
         }
@@ -99,7 +106,7 @@ public static class RiskReportExcel
     private static void LevelCell(IXLCell cell, RiskLevel level)
     {
         var (_, red, green, blue) = RiskPalette.Argb(level);
-        cell.Value = level.ToFr();
+        cell.Value = RiskText.Level(level);
         cell.Style.Fill.BackgroundColor = XLColor.FromArgb(red, green, blue);
         cell.Style.Font.FontColor = XLColor.White;
         cell.Style.Font.Bold = true;
@@ -107,5 +114,5 @@ public static class RiskReportExcel
     }
 
     private static string Label(IReadOnlyList<string> levels, int index)
-        => index >= 0 && index < levels.Count ? levels[index] : string.Empty;
+        => index >= 0 && index < levels.Count ? LanguageManager.Get(levels[index]) : string.Empty;
 }

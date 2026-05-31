@@ -7,22 +7,22 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Title="Nouvelle analyse"
-    PrimaryButtonText="Créer"
-    CloseButtonText="Annuler"
+    Title="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Dialog_NewTitle}"
+    PrimaryButtonText="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Dialog_Create}"
+    CloseButtonText="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Common_Cancel}"
     DefaultButton="Primary">
 
     <ScrollViewer MaxHeight="520" HorizontalScrollMode="Disabled">
         <StackPanel Spacing="16" MinWidth="380">
             <TextBox x:Name="NameBox"
-                     Header="Nom de l'analyse"
-                     PlaceholderText="Ex. AD Account Manager" />
+                     Header="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Dialog_Name}"
+                     PlaceholderText="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Dialog_NamePlaceholder}" />
 
-            <RadioButtons x:Name="ModelChoice" Header="Modèle de matrice">
+            <RadioButtons x:Name="ModelChoice" Header="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Dialog_Model}">
                 <RadioButtons.ItemTemplate>
                     <DataTemplate x:DataType="risks:RiskMatrixModel">
                         <StackPanel Spacing="0">
-                            <TextBlock Text="{x:Bind Name}" />
+                            <TextBlock Text="{Binding Name, Converter={StaticResource L}}" />
                             <TextBlock Text="{x:Bind Dimensions}"
                                        Style="{StaticResource CaptionTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -32,13 +32,13 @@
             </RadioButtons>
 
             <TextBlock x:Name="ModelLockHint" Visibility="Collapsed"
-                       Text="Le modèle de matrice ne peut pas être changé après création."
+                       Text="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Dialog_ModelLock}"
                        Style="{StaticResource CaptionTextBlockStyle}"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
-            <TextBox x:Name="AuthorBox" Header="Auteur (facultatif)" />
-            <TextBox x:Name="OrgBox" Header="Organisation (facultatif)" />
-            <TextBox x:Name="DescBox" Header="Description du projet (facultatif)"
+            <TextBox x:Name="AuthorBox" Header="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Dialog_Author}" />
+            <TextBox x:Name="OrgBox" Header="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Dialog_Org}" />
+            <TextBox x:Name="DescBox" Header="{Binding Source={StaticResource Loc}, Converter={StaticResource L}, ConverterParameter=Dialog_Desc}"
                      TextWrapping="Wrap" AcceptsReturn="True" Height="72" />
         </StackPanel>
     </ScrollViewer>

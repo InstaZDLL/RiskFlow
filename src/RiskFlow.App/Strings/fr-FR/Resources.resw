@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata"><xsd:complexType><xsd:sequence><xsd:element name="value" type="xsd:string" minOccurs="0" /></xsd:sequence><xsd:attribute name="name" use="required" type="xsd:string" /><xsd:attribute name="type" type="xsd:string" /><xsd:attribute name="mimetype" type="xsd:string" /><xsd:attribute ref="xml:space" /></xsd:complexType></xsd:element>
+          <xsd:element name="assembly"><xsd:complexType><xsd:attribute name="alias" type="xsd:string" /><xsd:attribute name="name" type="xsd:string" /></xsd:complexType></xsd:element>
+          <xsd:element name="data"><xsd:complexType><xsd:sequence><xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" /><xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" /></xsd:sequence><xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" /><xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" /><xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" /><xsd:attribute ref="xml:space" /></xsd:complexType></xsd:element>
+          <xsd:element name="resheader"><xsd:complexType><xsd:sequence><xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" /></xsd:sequence><xsd:attribute name="name" type="xsd:string" use="required" /></xsd:complexType></xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Common_System" xml:space="preserve"><value>Système</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="Common_Save" xml:space="preserve"><value>Enregistrer</value></data>
+  <data name="Common_Add" xml:space="preserve"><value>Ajouter</value></data>
+  <data name="Common_Delete" xml:space="preserve"><value>Supprimer</value></data>
+  <data name="Common_Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="Common_Close" xml:space="preserve"><value>Fermer</value></data>
+  <data name="Common_Author" xml:space="preserve"><value>Auteur</value></data>
+  <data name="Common_Organization" xml:space="preserve"><value>Organisation</value></data>
+  <data name="Pane_NewAnalysis" xml:space="preserve"><value>Nouvelle analyse</value></data>
+  <data name="Pane_Import" xml:space="preserve"><value>Importer une analyse (JSON)</value></data>
+  <data name="Menu_Edit" xml:space="preserve"><value>Modifier…</value></data>
+  <data name="Menu_Delete" xml:space="preserve"><value>Supprimer</value></data>
+  <data name="Header_Model" xml:space="preserve"><value>modèle</value></data>
+  <data name="Card_Total" xml:space="preserve"><value>Risques</value></data>
+  <data name="Card_Critical" xml:space="preserve"><value>Critiques</value></data>
+  <data name="Card_High" xml:space="preserve"><value>Élevés</value></data>
+  <data name="Card_Blocked" xml:space="preserve"><value>Non poursuivables</value></data>
+  <data name="Tab_Register" xml:space="preserve"><value>Registre</value></data>
+  <data name="Tab_Matrix" xml:space="preserve"><value>Matrice</value></data>
+  <data name="Reg_Add" xml:space="preserve"><value>Ajouter un risque</value></data>
+  <data name="Reg_Delete" xml:space="preserve"><value>Supprimer</value></data>
+  <data name="Reg_Up" xml:space="preserve"><value>Monter</value></data>
+  <data name="Reg_Down" xml:space="preserve"><value>Descendre</value></data>
+  <data name="Reg_ExportPdf" xml:space="preserve"><value>Exporter PDF</value></data>
+  <data name="Reg_ExportExcel" xml:space="preserve"><value>Exporter Excel</value></data>
+  <data name="Reg_ExportJson" xml:space="preserve"><value>Exporter JSON</value></data>
+  <data name="Reg_Descriptions" xml:space="preserve"><value>Descriptions</value></data>
+  <data name="Col_GroupId" xml:space="preserve"><value>IDENTIFICATION</value></data>
+  <data name="Col_GroupBefore" xml:space="preserve"><value>AVANT ATTÉNUATION</value></data>
+  <data name="Col_GroupAfter" xml:space="preserve"><value>APRÈS ATTÉNUATION</value></data>
+  <data name="Col_Num" xml:space="preserve"><value>N°</value></data>
+  <data name="Col_Title" xml:space="preserve"><value>Titre</value></data>
+  <data name="Col_Category" xml:space="preserve"><value>Catégorie</value></data>
+  <data name="Col_Description" xml:space="preserve"><value>Description</value></data>
+  <data name="Col_Severity" xml:space="preserve"><value>Gravité</value></data>
+  <data name="Col_Likelihood" xml:space="preserve"><value>Probabilité</value></data>
+  <data name="Col_Level" xml:space="preserve"><value>Niveau</value></data>
+  <data name="Col_Strategy" xml:space="preserve"><value>Stratégie</value></data>
+  <data name="Col_Continue" xml:space="preserve"><value>Continuer ?</value></data>
+  <data name="Matrix_Eval" xml:space="preserve"><value>Évaluation :</value></data>
+  <data name="Matrix_Before" xml:space="preserve"><value>Avant mitigation</value></data>
+  <data name="Matrix_After" xml:space="preserve"><value>Après mitigation</value></data>
+  <data name="Detail_Title" xml:space="preserve"><value>Détail du risque</value></data>
+  <data name="Detail_TitleField" xml:space="preserve"><value>Titre</value></data>
+  <data name="Detail_Category" xml:space="preserve"><value>Catégorie</value></data>
+  <data name="Detail_Description" xml:space="preserve"><value>Description</value></data>
+  <data name="Detail_Before" xml:space="preserve"><value>Avant mitigation</value></data>
+  <data name="Detail_Severity" xml:space="preserve"><value>Gravité</value></data>
+  <data name="Detail_Likelihood" xml:space="preserve"><value>Probabilité</value></data>
+  <data name="Detail_Strategy" xml:space="preserve"><value>Stratégie de mitigation</value></data>
+  <data name="Detail_After" xml:space="preserve"><value>Après mitigation</value></data>
+  <data name="Detail_CanContinue" xml:space="preserve"><value>Le projet peut continuer</value></data>
+  <data name="Detail_Yes" xml:space="preserve"><value>Oui</value></data>
+  <data name="Detail_No" xml:space="preserve"><value>Non</value></data>
+  <data name="Toast_Saved" xml:space="preserve"><value>Sauvegardé</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>Réglages</value></data>
+  <data name="Settings_Appearance" xml:space="preserve"><value>Apparence</value></data>
+  <data name="Settings_Theme" xml:space="preserve"><value>Thème</value></data>
+  <data name="Theme_Light" xml:space="preserve"><value>Clair</value></data>
+  <data name="Theme_Dark" xml:space="preserve"><value>Sombre</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>Langue</value></data>
+  <data name="Lang_French" xml:space="preserve"><value>Français</value></data>
+  <data name="Lang_English" xml:space="preserve"><value>English</value></data>
+  <data name="Settings_MatrixDisplay" xml:space="preserve"><value>Affichage de la matrice</value></data>
+  <data name="Settings_Placement" xml:space="preserve"><value>Emplacement</value></data>
+  <data name="Placement_Tabs" xml:space="preserve"><value>Onglets Registre / Matrice</value></data>
+  <data name="Placement_Below" xml:space="preserve"><value>Sous le tableau</value></data>
+  <data name="Settings_CellContent" xml:space="preserve"><value>Contenu des cellules</value></data>
+  <data name="Cell_Numbers" xml:space="preserve"><value>Numéros des risques</value></data>
+  <data name="Cell_Count" xml:space="preserve"><value>Compteur</value></data>
+  <data name="Settings_DefaultEval" xml:space="preserve"><value>Évaluation par défaut</value></data>
+  <data name="Settings_Report" xml:space="preserve"><value>Rapport (export PDF)</value></data>
+  <data name="Settings_ReportHint" xml:space="preserve"><value>Valeurs par défaut, surchargeables par analyse.</value></data>
+  <data name="Settings_Categories" xml:space="preserve"><value>Catégories de risques</value></data>
+  <data name="Settings_NewCategory" xml:space="preserve"><value>Nouvelle catégorie…</value></data>
+  <data name="Settings_About" xml:space="preserve"><value>À propos</value></data>
+  <data name="Settings_SourceCode" xml:space="preserve"><value>Code source (GitHub)</value></data>
+  <data name="Dialog_NewTitle" xml:space="preserve"><value>Nouvelle analyse</value></data>
+  <data name="Dialog_EditTitle" xml:space="preserve"><value>Modifier l&apos;analyse</value></data>
+  <data name="Dialog_Create" xml:space="preserve"><value>Créer</value></data>
+  <data name="Dialog_Name" xml:space="preserve"><value>Nom de l&apos;analyse</value></data>
+  <data name="Dialog_NamePlaceholder" xml:space="preserve"><value>Ex. AD Account Manager</value></data>
+  <data name="Dialog_Model" xml:space="preserve"><value>Modèle de matrice</value></data>
+  <data name="Dialog_ModelLock" xml:space="preserve"><value>Le modèle de matrice ne peut pas être changé après création.</value></data>
+  <data name="Dialog_Author" xml:space="preserve"><value>Auteur (facultatif)</value></data>
+  <data name="Dialog_Org" xml:space="preserve"><value>Organisation (facultatif)</value></data>
+  <data name="Dialog_Desc" xml:space="preserve"><value>Description du projet (facultatif)</value></data>
+  <data name="Confirm_DeleteTitle" xml:space="preserve"><value>Supprimer l&apos;analyse</value></data>
+  <data name="Confirm_DeleteBody" xml:space="preserve"><value>Supprimer « {0} » et tous ses risques ? Cette action est irréversible.</value></data>
+  <data name="Msg_LastAnalysis" xml:space="preserve"><value>Impossible de supprimer la dernière analyse.</value></data>
+  <data name="Msg_ImportError" xml:space="preserve"><value>Import impossible : {0}</value></data>
+  <data name="Picker_Pdf" xml:space="preserve"><value>Document PDF</value></data>
+  <data name="Picker_Excel" xml:space="preserve"><value>Classeur Excel</value></data>
+  <data name="Picker_Json" xml:space="preserve"><value>Analyse RiskFlow (JSON)</value></data>
+  <data name="Level_Low" xml:space="preserve"><value>Bas</value></data>
+  <data name="Level_Medium" xml:space="preserve"><value>Moyen</value></data>
+  <data name="Level_High" xml:space="preserve"><value>Élevé</value></data>
+  <data name="Level_Extreme" xml:space="preserve"><value>Critique</value></data>
+  <data name="Sev_Acceptable" xml:space="preserve"><value>Acceptable</value></data>
+  <data name="Sev_Tolerable" xml:space="preserve"><value>Tolérable</value></data>
+  <data name="Sev_Undesirable" xml:space="preserve"><value>Indésirable</value></data>
+  <data name="Sev_Intolerable" xml:space="preserve"><value>Intolérable</value></data>
+  <data name="Sev_Negligible" xml:space="preserve"><value>Négligeable</value></data>
+  <data name="Sev_Minor" xml:space="preserve"><value>Mineur</value></data>
+  <data name="Sev_Moderate" xml:space="preserve"><value>Modéré</value></data>
+  <data name="Sev_Major" xml:space="preserve"><value>Majeur</value></data>
+  <data name="Sev_Critical" xml:space="preserve"><value>Critique</value></data>
+  <data name="Lik_Improbable" xml:space="preserve"><value>Improbable</value></data>
+  <data name="Lik_Possible" xml:space="preserve"><value>Possible</value></data>
+  <data name="Lik_Probable" xml:space="preserve"><value>Probable</value></data>
+  <data name="Lik_VeryProbable" xml:space="preserve"><value>Très probable</value></data>
+  <data name="Lik_VeryRare" xml:space="preserve"><value>Très rare</value></data>
+  <data name="Lik_Rare" xml:space="preserve"><value>Rare</value></data>
+  <data name="Cat_Functional" xml:space="preserve"><value>Fonctionnel</value></data>
+  <data name="Cat_Technical" xml:space="preserve"><value>Technique</value></data>
+  <data name="Cat_Security" xml:space="preserve"><value>Sécurité</value></data>
+  <data name="Cat_Organizational" xml:space="preserve"><value>Organisationnel</value></data>
+  <data name="Cat_Quality" xml:space="preserve"><value>Qualité</value></data>
+  <data name="Cat_Compliance" xml:space="preserve"><value>Conformité/LPD</value></data>
+  <data name="Cat_Project" xml:space="preserve"><value>Projet</value></data>
+  <data name="Model_3x4" xml:space="preserve"><value>Standard 3×4</value></data>
+  <data name="Model_4x4" xml:space="preserve"><value>Étendu 4×4</value></data>
+  <data name="Model_5x5" xml:space="preserve"><value>Détaillé 5×5</value></data>
+  <data name="Report_Title" xml:space="preserve"><value>Analyse de risques</value></data>
+  <data name="Report_ExportedOn" xml:space="preserve"><value>Exporté le</value></data>
+  <data name="Report_MatrixBefore" xml:space="preserve"><value>Matrice — avant mitigation</value></data>
+  <data name="Report_MatrixAfter" xml:space="preserve"><value>Matrice — après mitigation</value></data>
+  <data name="Toast_RestartLanguage" xml:space="preserve"><value>Redémarrez l&apos;application pour appliquer la langue.</value></data>
+</root>

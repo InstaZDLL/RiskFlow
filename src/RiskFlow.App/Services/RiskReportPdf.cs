@@ -30,10 +30,10 @@ public static class RiskReportPdf
                 {
                     col.Item().Element(e => Table(e, risks, model));
 
-                    col.Item().PaddingTop(18).Text("Matrice — avant mitigation").Bold().FontSize(11);
+                    col.Item().PaddingTop(18).Text(LanguageManager.Get("Report_MatrixBefore")).Bold().FontSize(11);
                     col.Item().PaddingTop(4).Element(e => Matrix(e, risks, model, useAfter: false));
 
-                    col.Item().PaddingTop(14).Text("Matrice — après mitigation").Bold().FontSize(11);
+                    col.Item().PaddingTop(14).Text(LanguageManager.Get("Report_MatrixAfter")).Bold().FontSize(11);
                     col.Item().PaddingTop(4).Element(e => Matrix(e, risks, model, useAfter: true));
                 });
                 page.Footer().AlignCenter().Text(t =>
@@ -51,12 +51,12 @@ public static class RiskReportPdf
 
     private static void Header(IContainer container, Analysis analysis, string author, string organization, DateTimeOffset date)
     {
-        var parts = new[] { analysis.Name, author, organization, $"Exporté le {date:dd/MM/yyyy}" }
+        var parts = new[] { analysis.Name, author, organization, $"{LanguageManager.Get("Report_ExportedOn")} {date:dd/MM/yyyy}" }
             .Where(p => !string.IsNullOrWhiteSpace(p));
 
         container.BorderBottom(1).BorderColor(Grid).PaddingBottom(8).Column(col =>
         {
-            col.Item().Text("Analyse de risques").Bold().FontSize(18);
+            col.Item().Text(LanguageManager.Get("Report_Title")).Bold().FontSize(18);
             col.Item().Text(string.Join("  —  ", parts)).FontColor(Colors.Grey.Darken1).FontSize(9.5f);
             if (!string.IsNullOrWhiteSpace(analysis.ProjectDescription))
                 col.Item().PaddingTop(2).Text(analysis.ProjectDescription).FontColor(Colors.Grey.Darken1).FontSize(9);
@@ -85,9 +85,16 @@ public static class RiskReportPdf
 
             table.Header(h =>
             {
-                foreach (var title in new[] { "#", "Titre", "Catégorie", "Description",
-                    "Gravité", "Probabilité", "Niveau", "Stratégie",
-                    "Gravité", "Probabilité", "Niveau", "Cont." })
+                var titles = new[]
+                {
+                    LanguageManager.Get("Col_Num"), LanguageManager.Get("Col_Title"),
+                    LanguageManager.Get("Col_Category"), LanguageManager.Get("Col_Description"),
+                    LanguageManager.Get("Col_Severity"), LanguageManager.Get("Col_Likelihood"),
+                    LanguageManager.Get("Col_Level"), LanguageManager.Get("Col_Strategy"),
+                    LanguageManager.Get("Col_Severity"), LanguageManager.Get("Col_Likelihood"),
+                    LanguageManager.Get("Col_Level"), LanguageManager.Get("Col_Continue"),
+                };
+                foreach (var title in titles)
                 {
                     h.Cell().Background(HeaderBg).Border(0.5f).BorderColor(Grid)
                         .Padding(4).Text(title).Bold().FontSize(8);
@@ -102,7 +109,7 @@ public static class RiskReportPdf
 
                 Text(table, n.ToString());
                 Text(table, risk.Title);
-                Text(table, risk.Category);
+                Text(table, RiskText.Category(risk.Category));
                 Text(table, risk.Description ?? string.Empty);
                 Text(table, Label(model.SeverityLevels, risk.BeforeSeverityIndex));
                 Text(table, Label(model.LikelihoodLevels, risk.BeforeLikelihoodIndex));
@@ -111,7 +118,7 @@ public static class RiskReportPdf
                 Text(table, Label(model.SeverityLevels, risk.AfterSeverityIndex));
                 Text(table, Label(model.LikelihoodLevels, risk.AfterLikelihoodIndex));
                 LevelCell(table, afterLevel);
-                Text(table, risk.CanContinue ? "Oui" : "Non");
+                Text(table, LanguageManager.Get(risk.CanContinue ? "Detail_Yes" : "Detail_No"));
                 n++;
             }
         });
@@ -135,14 +142,14 @@ public static class RiskReportPdf
             table.Cell().Background(HeaderBg).Border(0.5f).BorderColor(Grid).Padding(4).Text(string.Empty);
             for (var s = 0; s < nSev; s++)
                 table.Cell().Background(HeaderBg).Border(0.5f).BorderColor(Grid)
-                    .Padding(4).AlignCenter().Text(model.SeverityLevels[s]).Bold().FontSize(8);
+                    .Padding(4).AlignCenter().Text(LanguageManager.Get(model.SeverityLevels[s])).Bold().FontSize(8);
 
             // Lignes : probabilité la plus forte en haut.
             for (var rowIdx = 1; rowIdx <= nLik; rowIdx++)
             {
                 var likIndex = nLik - rowIdx;
                 table.Cell().Background(HeaderBg).Border(0.5f).BorderColor(Grid)
-                    .Padding(4).AlignMiddle().Text(model.LikelihoodLevels[likIndex]).Bold().FontSize(8);
+                    .Padding(4).AlignMiddle().Text(LanguageManager.Get(model.LikelihoodLevels[likIndex])).Bold().FontSize(8);
 
                 for (var s = 0; s < nSev; s++)
                 {
@@ -171,8 +178,8 @@ public static class RiskReportPdf
 
     private static void LevelCell(TableDescriptor table, RiskLevel level)
         => table.Cell().Background(RiskPalette.Hex(level)).Border(0.5f).BorderColor(Grid)
-            .Padding(4).AlignCenter().Text(level.ToFr()).FontColor("#FFFFFF").Bold().FontSize(8);
+            .Padding(4).AlignCenter().Text(RiskText.Level(level)).FontColor("#FFFFFF").Bold().FontSize(8);
 
     private static string Label(IReadOnlyList<string> levels, int index)
-        => index >= 0 && index < levels.Count ? levels[index] : string.Empty;
+        => index >= 0 && index < levels.Count ? LanguageManager.Get(levels[index]) : string.Empty;
 }

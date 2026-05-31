@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml;
 using RiskFlow.Core.Risks;
 using RiskFlow.Data;
+using RiskFlow.Services;
 
 namespace RiskFlow.ViewModels;
 
@@ -85,9 +86,21 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
         return Rows.Select(r => r.Model).ToList();
     }
 
-    /// <summary>Affiche brièvement la confirmation « Sauvegardé ».</summary>
+    /// <summary>Toast discret (confirmation, message…), auto-masqué.</summary>
     [ObservableProperty]
     public partial bool SavedMessageVisible { get; set; }
+
+    [ObservableProperty]
+    public partial string ToastMessage { get; set; } = string.Empty;
+
+    /// <summary>Affiche un toast pendant quelques secondes.</summary>
+    public async Task ShowToastAsync(string message, int seconds = 2)
+    {
+        ToastMessage = message;
+        SavedMessageVisible = true;
+        await Task.Delay(TimeSpan.FromSeconds(seconds));
+        SavedMessageVisible = false;
+    }
 
     /// <summary>Fixe l'analyse affichée, recharge ses risques et les catégories.</summary>
     public async Task SetAnalysisAsync(Analysis? analysis)
@@ -95,10 +108,10 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
         _analysis = analysis;
         _model = analysis?.Model ?? RiskMatrixModels.Default;
         AnalysisName = analysis?.Name ?? string.Empty;
-        ModelName = _model.Name;
+        ModelName = LanguageManager.Get(_model.Name);
         HasAnalysis = analysis is not null;
-        SeverityLevels = _model.SeverityLevels;
-        LikelihoodLevels = _model.LikelihoodLevels;
+        SeverityLevels = _model.SeverityLevels.Select(LanguageManager.Get).ToList();
+        LikelihoodLevels = _model.LikelihoodLevels.Select(LanguageManager.Get).ToList();
 
         await LoadCategoriesAsync();
         await LoadAsync();
@@ -211,9 +224,7 @@ public partial class RisksViewModel(IDbContextFactory<RiskFlowDbContext> dbFacto
 
         // Ferme le panneau et affiche brièvement la confirmation.
         SelectedRow = null;
-        SavedMessageVisible = true;
-        await Task.Delay(TimeSpan.FromSeconds(2));
-        SavedMessageVisible = false;
+        await ShowToastAsync(LanguageManager.Get("Toast_Saved"));
     }
 
     /// <summary>Ferme le panneau de détail (désélectionne le risque courant).</summary>
