@@ -100,8 +100,50 @@ Migrations are applied automatically at startup (`DbInitializer`).
 Produces an xcopy-deployable folder containing `RiskFlow.exe` and the whole runtime:
 
 ```powershell
-dotnet publish src/RiskFlow.App/RiskFlow.csproj -c Release -r win-x64 -p:Platform=x64
-# → bin/x64/Release/net10.0-windows10.0.19041.0/win-x64/publish/RiskFlow.exe
+dotnet publish src/RiskFlow.App/RiskFlow.csproj -c Release -r win-x64 -p:Platform=x64 -o publish
+# → publish/RiskFlow.exe (self-contained, ~330 MB)
+```
+
+### Installer
+
+An [Inno Setup](https://jrsoftware.org/isinfo.php) script (`installer/RiskFlow.iss`) wraps the
+published folder into `RiskFlow-Setup.exe`:
+
+```powershell
+& "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DMyAppVersion=1.0.0 installer\RiskFlow.iss
+# → installer-output/RiskFlow-Setup.exe
+```
+
+## CI/CD
+
+- **CI** (`.github/workflows/ci.yml`) builds the app on every push/PR to `main`.
+- **Release** (`.github/workflows/release.yml`) runs on a `v*` tag (or manually): publishes the
+  self-contained app, optionally signs it, builds the installer, and attaches `RiskFlow-Setup.exe`
+  to a GitHub Release.
+
+Trigger a release:
+
+```powershell
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+### Code signing (optional)
+
+To sign `RiskFlow.exe` and the installer, add two repository secrets — the build skips signing if
+they are absent:
+
+| Secret | Value |
+|--------|-------|
+| `PFX_BASE64` | the `.pfx` certificate, Base64-encoded |
+| `PFX_PASSWORD` | the certificate password |
+
+Encode and upload the certificate (PowerShell + GitHub CLI):
+
+```powershell
+$b64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes("path\to\cert.pfx"))
+$b64 | gh secret set PFX_BASE64 --repo InstaZDLL/RiskFlow
+gh secret set PFX_PASSWORD --repo InstaZDLL/RiskFlow   # prompts for the password
 ```
 
 ## License

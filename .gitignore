@@ -3,6 +3,8 @@ obj/
 .vs/
 *.user
 publish/
+installer-output/
+*.pfx
 *.db
 *.db-shm
 *.db-wal
