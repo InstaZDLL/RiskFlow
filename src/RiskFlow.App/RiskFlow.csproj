@@ -73,4 +73,16 @@
     <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">true</PublishReadyToRun>
     <PublishTrimmed>false</PublishTrimmed>
   </PropertyGroup>
+
+  <!--
+    App non packagée : « dotnet publish » n'inclut pas le PRI fusionné de l'app
+    (RiskFlow.pri). Sans lui, WinUI ne trouve aucune ressource XAML au démarrage et
+    l'app crashe immédiatement (0xC000027B). On le recopie donc dans la sortie publish.
+  -->
+  <Target Name="IncludeAppPriInPublish" AfterTargets="Publish">
+    <Copy Condition="Exists('$(OutDir)$(TargetName).pri')"
+          SourceFiles="$(OutDir)$(TargetName).pri"
+          DestinationFolder="$(PublishDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
 </Project>
